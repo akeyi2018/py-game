@@ -9,6 +9,10 @@ class Backmusic:
         pg.mixer.music.set_volume(0.5)
         pg.mixer.music.play(-1)
 
+    def play_one(self):
+        pg.mixer.music.set_volume(0.5)
+        pg.mixer.music.play()
+
     def stop(self):
         pg.mixer.music.stop()
 
@@ -36,12 +40,24 @@ class Utils:
                 if event.type == pg.QUIT:
                     self.waiting = False
                 if event.type == pg.MOUSEBUTTONDOWN:
-                    self.waiting = False
+                    self.play_sort_sound()
+                    self.waiting = True
+
 
     def play_background_music_main_scene(self):
         self.main_background_music = Backmusic('./music/y004.mp3')
         try:
            self.main_background_music.play()
+        except Exception as e:
+            print(f"音楽ファイルの読み込みに失敗しました: {e}")
+    
+    def stop_background_music_main_scene(self):
+        self.main_background_music.stop()
+
+    def play_sort_sound(self):
+        self.main_background_music = Backmusic('./music/sort_snd.mp3')
+        try:
+           self.main_background_music.play_one()
         except Exception as e:
             print(f"音楽ファイルの読み込みに失敗しました: {e}")
 

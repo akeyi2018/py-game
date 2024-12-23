@@ -122,16 +122,7 @@ class Spritesheet:
         sprite.set_colorkey(BLACK)
         return sprite
 
-class Backmusic:
-    def __init__(self, file):
-        self.music = pygame.mixer.music.load(file)
 
-    def play(self):
-        pygame.mixer.music.set_volume(0.5)
-        pygame.mixer.music.play(-1)
-
-    def stop(self):
-        pygame.mixer.music.stop()
         
 class Ground(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
