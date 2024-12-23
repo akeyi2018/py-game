@@ -102,10 +102,10 @@ class game:
 if __name__ == "__main__":
     new_game = game()
     new_game.intro_screen()
-    new_game.new()
-    while new_game.running:
-        new_game.main()
-        new_game.game_over()
+    # new_game.new()
+    # while new_game.running:
+    #     new_game.main()
+    #     new_game.game_over()
 
     pygame.quit()       # Pygameの終了(画面閉じられる)
     sys.exit()
