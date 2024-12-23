@@ -1,6 +1,17 @@
 import pygame as pg
 from config import *
 
+class Backmusic:
+    def __init__(self, file):
+        self.music = pg.mixer.music.load(file)
+
+    def play(self):
+        pg.mixer.music.set_volume(0.5)
+        pg.mixer.music.play(-1)
+
+    def stop(self):
+        pg.mixer.music.stop()
+
 class Utils:
     def __init__(self):
         self.clock = pg.time.Clock()
@@ -25,4 +36,12 @@ class Utils:
                 if event.type == pg.QUIT:
                     self.waiting = False
                 if event.type == pg.MOUSEBUTTONDOWN:
-                    self.waiting = False   
+                    self.waiting = False
+
+    def play_background_music_main_scene(self):
+        self.main_background_music = Backmusic('./music/y004.mp3')
+        try:
+           self.main_background_music.play()
+        except Exception as e:
+            print(f"音楽ファイルの読み込みに失敗しました: {e}")
+

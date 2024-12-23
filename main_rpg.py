@@ -1,6 +1,6 @@
 import pygame as pg
 from settings import *
-from py_sprites import Backmusic
+
 from util import Utils
 
 class game:
@@ -14,21 +14,13 @@ class game:
         self.util = Utils()
 
     def intro_screen(self):
-        self.start_music()
         self.screen.fill(BGCOLOR)
-
+        self.util.play_background_music_main_scene()
         self.util.draw_text("Start new Game", 28, 
                              MOJICOLOR, WIDTH / 2, HEIGHT * 3 / 4, self.screen)
         pg.display.flip()
         self.util.wait_event()
         
-
-    def start_music(self):
-        self.music = Backmusic('./music/y004.mp3')
-        try:
-           self.music.play()
-        except Exception as e:
-            print(f"音楽ファイルの読み込みに失敗しました: {e}")
 
     def run(self):
         # 描画更新
