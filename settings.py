@@ -21,6 +21,7 @@ PLATFORM_LIST = [(0, HEIGHT - 40, WIDTH, 40),
                  (175, 100, 50, 20)]
 
 # define colors
+MOJICOLOR = (255,255,255)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 DARKGREY = (27, 140, 141)

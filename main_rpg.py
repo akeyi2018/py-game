@@ -1,6 +1,7 @@
 import pygame as pg
 from settings import *
 from py_sprites import Backmusic
+from util import Utils
 
 class game:
     def __init__(self):
@@ -10,11 +11,17 @@ class game:
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
         self.clock = pg.time.Clock()
         self.running = True
+        self.util = Utils()
 
     def intro_screen(self):
-        self.screen.fill(BGCOLOR)
-        pg.display.flip()
         self.start_music()
+        self.screen.fill(BGCOLOR)
+
+        self.util.draw_text("Start new Game", 28, 
+                             MOJICOLOR, WIDTH / 2, HEIGHT * 3 / 4, self.screen)
+        pg.display.flip()
+        self.util.wait_event()
+        
 
     def start_music(self):
         self.music = Backmusic('./music/y004.mp3')
