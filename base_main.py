@@ -1,5 +1,6 @@
 import pygame as pg
 from settings import *
+from player import Player
 
 class game:
     def __init__(self):
@@ -8,14 +9,19 @@ class game:
         # screen
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
         # title
-        pg.display.set_caption('Game Title')
+        pg.display.set_caption(TITLE)
         # clock
         self.clock = pg.time.Clock()
         self.running = True
+        # group
+        self.all_sprites = pg.sprite.Group()
+
+        # sprites
+        self.player = Player((400,300), self.all_sprites)
 
     def run(self):
         """ゲームループ"""
-        self.clock.tick(30)
+        dt = self.clock.tick(FPS) / 1000
 
         while self.running:
             # イベント処理
@@ -23,7 +29,14 @@ class game:
                 if event.type == pg.QUIT:
                     self.running = False
 
-            pg.display.update()
+            # update
+            self.all_sprites.update(dt)
+
+            # draw
+            self.screen.fill('black')
+            self.all_sprites.draw(self.screen)
+
+            pg.display.flip()
 
         pg.quit()
 
