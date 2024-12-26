@@ -1,6 +1,9 @@
 import pygame as pg
 from settings import *
 from player import Player
+from random import randint
+from sprites import CollisionSprite
+
 
 class game:
     def __init__(self):
@@ -15,9 +18,14 @@ class game:
         self.running = True
         # group
         self.all_sprites = pg.sprite.Group()
+        self.collision_sprites = pg.sprite.Group()
 
         # sprites
-        self.player = Player((400,300), self.all_sprites)
+        self.player = Player((400,300), self.all_sprites, self.collision_sprites)
+        for i in range(6):
+            x,y = randint(0, WIDTH), randint(0, HEIGHT)
+            w,h = randint(60,100),randint(50,100)
+            CollisionSprite((x,y), (w,h), self.all_sprites, self.collision_sprites)
 
     def run(self):
         """ゲームループ"""

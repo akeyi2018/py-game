@@ -3,7 +3,7 @@ import pygame as pg
 from os.path import join
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, pos, groups):
+    def __init__(self, pos, groups, collision_sprites):
         super().__init__(groups)
         self.image = pg.image.load(join('./img','F1.png')).convert_alpha()
         # get_frectでないとバグがある
@@ -11,8 +11,8 @@ class Player(pg.sprite.Sprite):
 
         # movement
         self.direction = pg.Vector2(0,0)
-        self.speed = 10
-        # self.moving = False  # 移動中かどうかを追跡
+        self.speed = 30
+        self.collision_sprites = collision_sprites
 
     def input(self):
         keys = pg.key.get_pressed()
@@ -24,7 +24,20 @@ class Player(pg.sprite.Sprite):
 
     def move(self, dt):
         # directionに基づいて移動
-        self.rect.center += self.direction * self.speed * dt
+        self.rect.x += self.direction.x * self.speed * dt
+        self.collision('horizontal')
+        self.rect.y += self.direction.y * self.speed * dt
+        self.collision('vertical')
+
+    def collision(self,direction):
+        for sprite in self.collision_sprites:
+            if sprite.rect.colliderect(self.rect):
+                if direction == 'horizontal':
+                    if self.direction.x > 0: self.rect.right = sprite.rect.left
+                    if self.direction.x < 0: self.rect.left = sprite.rect.right
+                elif direction == 'vertical':
+                    if self.direction.y > 0: self.rect.bottom = sprite.rect.top
+                    if self.direction.y < 0: self.rect.top = sprite.rect.bottom
 
 
     def update(self, dt):
