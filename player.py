@@ -14,7 +14,7 @@ class Player(pg.sprite.Sprite):
 
         # movement
         self.direction = pg.Vector2(0,0)
-        self.speed = 30
+        self.speed = 15
         self.collision_sprites = collision_sprites
 
     def input(self):

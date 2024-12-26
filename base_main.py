@@ -3,6 +3,7 @@ from settings import *
 from player import Player
 from random import randint
 from sprites import CollisionSprite, Sprite
+from groups import AllSprites
 from pytmx.util_pygame import load_pygame
 from os.path import join
 
@@ -18,7 +19,7 @@ class game:
         self.clock = pg.time.Clock()
         self.running = True
         # group
-        self.all_sprites = pg.sprite.Group()
+        self.all_sprites = AllSprites()
         self.collision_sprites = pg.sprite.Group()
 
         self.setup()
@@ -31,9 +32,12 @@ class game:
         map = load_pygame(join('./maps','world.tmx'))
         for x, y, image in map.get_layer_by_name('Ground').tiles():
             Sprite((x * TILE, y * TILE), image, self.all_sprites)
-            
+
         for obj in map.get_layer_by_name('Objects'):
             CollisionSprite((obj.x, obj.y), obj.image, self.all_sprites, self.collision_sprites)
+
+        for obj in map.get_layer_by_name('Collisions'):
+            CollisionSprite((obj.x, obj.y), pg.Surface((obj.width, obj.height)), self.collision_sprites)
 
 
     def run(self):
@@ -51,7 +55,7 @@ class game:
 
             # draw
             self.screen.fill('black')
-            self.all_sprites.draw(self.screen)
+            self.all_sprites.draw(self.player.rect.center)
 
             pg.display.flip()
 
