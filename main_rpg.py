@@ -15,7 +15,6 @@ class game:
         self.running = True
         self.util = Utils()
         self.current_screen = "intro"  # 現在の画面状態を管理
-        # self.character_spritesheet = Spritesheet('./img/F1.png')
 
         self.my_spritesheet = Spritesheet('trainer_sheet.png')
         self.trainer = [self.my_spritesheet.parse_sprite('trainer1.png'), 
@@ -26,9 +25,6 @@ class game:
 
     def intro_screen(self):
         self.screen.fill(BGCOLOR)
-        
-        # self.util.draw_text("Start new Game", 28, 
-        #                      MOJICOLOR, WIDTH / 2, HEIGHT * 3 / 4, self.screen)
 
         font = pg.font.Font(None, 36)
         text = font.render("Start new Game", True, MOJICOLOR)
@@ -65,6 +61,7 @@ class game:
 
     def run(self):
         """ゲームループ"""
+        self.clock.tick(10)
         # 描画更新
         self.intro_screen()
         if self.current_screen == "intro":
@@ -83,7 +80,7 @@ class game:
                     if event.key == pg.K_ESCAPE:
                         self.running = False
                     elif event.key == pg.K_SPACE:
-                        self.update_frames = 5  # スペースキーでアニメーション開始
+                        self.update_frames = 1  # スペースキーでアニメーション開始
 
             # 画面更新
             if self.current_screen == "intro":
@@ -91,7 +88,7 @@ class game:
             elif self.current_screen == "game":
                 self.main_game_screen()
 
-            self.clock.tick(60)
+            
         pg.quit()
 
 
