@@ -5,6 +5,7 @@ WIDTH = 1280
 HEIGHT = 720
 FPS = 60
 FONT_NAME = 'arial'
+TILE = 64
 
 # Player properties
 PLAYER_ACC = 0.5

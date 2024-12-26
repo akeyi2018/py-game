@@ -2,12 +2,15 @@ from settings import *
 import pygame as pg
 from os.path import join
 
+
 class Player(pg.sprite.Sprite):
     def __init__(self, pos, groups, collision_sprites):
         super().__init__(groups)
         self.image = pg.image.load(join('./img','F1.png')).convert_alpha()
         # get_frectでないとバグがある
         self.rect = self.image.get_frect(center = pos)
+
+        self.hitbox_rect = self.rect.inflate(-10,0)
 
         # movement
         self.direction = pg.Vector2(0,0)
@@ -24,20 +27,22 @@ class Player(pg.sprite.Sprite):
 
     def move(self, dt):
         # directionに基づいて移動
-        self.rect.x += self.direction.x * self.speed * dt
+        self.hitbox_rect.x += self.direction.x * self.speed * dt
         self.collision('horizontal')
-        self.rect.y += self.direction.y * self.speed * dt
+        self.hitbox_rect.y += self.direction.y * self.speed * dt
         self.collision('vertical')
+        # hitboxで衝突を検知し、座標を戻す
+        self.rect.center = self.hitbox_rect.center
 
     def collision(self,direction):
         for sprite in self.collision_sprites:
-            if sprite.rect.colliderect(self.rect):
+            if sprite.rect.colliderect(self.hitbox_rect):
                 if direction == 'horizontal':
-                    if self.direction.x > 0: self.rect.right = sprite.rect.left
-                    if self.direction.x < 0: self.rect.left = sprite.rect.right
+                    if self.direction.x > 0: self.hitbox_rect.right = sprite.rect.left
+                    if self.direction.x < 0: self.hitbox_rect.left = sprite.rect.right
                 elif direction == 'vertical':
-                    if self.direction.y > 0: self.rect.bottom = sprite.rect.top
-                    if self.direction.y < 0: self.rect.top = sprite.rect.bottom
+                    if self.direction.y > 0: self.hitbox_rect.bottom = sprite.rect.top
+                    if self.direction.y < 0: self.hitbox_rect.top = sprite.rect.bottom
 
 
     def update(self, dt):
