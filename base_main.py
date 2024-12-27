@@ -6,13 +6,14 @@ from sprites import CollisionSprite, Sprite
 from groups import AllSprites
 from pytmx.util_pygame import load_pygame
 from os.path import join
+from os import walk
 
 class game:
     def __init__(self):
         pg.init()
 
         # screen
-        self.screen = pg.display.set_mode((WIDTH, HEIGHT))
+        self.display_surface = pg.display.set_mode((WIDTH, HEIGHT))
         # title
         pg.display.set_caption(TITLE)
         # clock
@@ -27,6 +28,7 @@ class game:
         # sprites
         # self.player = Player((400,300), self.all_sprites, self.collision_sprites)
 
+   
     
     def setup(self):
         map = load_pygame(join('./maps','world.tmx'))
@@ -58,10 +60,10 @@ class game:
             self.all_sprites.update(dt)
 
             # draw
-            self.screen.fill('black')
+            self.display_surface.fill('black')
             self.all_sprites.draw(self.player.rect.center)
 
-            pg.display.flip()
+            pg.display.update()
 
         pg.quit()
 
