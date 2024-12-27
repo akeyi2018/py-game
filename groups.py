@@ -15,10 +15,10 @@ class AllSprites(pg.sprite.Group):
         object_sprites = [sprite for sprite in self if not hasattr(sprite, 'grd')]
 
         # 背景の描画
-        for sprite in ground_sprites:
-            self.display_surface.blit(sprite.image, sprite.rect.center + self.offset)
+        # for sprite in ground_sprites:
+        #     self.display_surface.blit(sprite.image, sprite.rect.center + self.offset)
 
         # スプライトのソートをやるとレイヤーの表示がおかしくなる
         for layer in [ground_sprites, object_sprites]:
             for sprite in sorted(layer, key = lambda sprite: sprite.rect.centery):
-                self.display_surface.blit(sprite.image, sprite.rect.center + self.offset)
+                self.display_surface.blit(sprite.image, sprite.rect.topleft + self.offset)
