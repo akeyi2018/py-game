@@ -2,6 +2,8 @@ import pygame as pg
 from settings import *
 from os.path import join
 
+from player import Player
+from sprites import Sprite
 
 class main:
     def __init__(self):
@@ -21,6 +23,13 @@ class main:
         self.running = True
 
         # group
+        # self.all_sprites = pg.sprite.Group()
+
+        # sprites
+        self.player = Player((400,300))
+        
+        # self.all_sprites.add(self.player.surf)
+
 
 
     def run(self):
@@ -34,10 +43,17 @@ class main:
                 if event.type == pg.QUIT:
                     self.running = False
             
-            # update
+            
 
             # draw
             self.main_screen.fill(BLUE)
+
+            # メイン画面にキャラクターを追加描画する
+            self.main_screen.blit(self.player.surf)
+
+            # update
+            self.player.update(dt)
+            
 
             pg.display.update()
 
