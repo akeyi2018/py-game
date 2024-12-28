@@ -4,6 +4,7 @@ from os.path import join
 from groups import AllSprites
 from player import Player
 from sprites import Sprite, CollisionSprite
+from enemy import Enemy
 
 class main:
     def __init__(self):
@@ -45,6 +46,9 @@ class main:
                     CollisionSprite((x,y), self.block, self.all_sprites, self.collision_sprites)
                 elif column == 'P':
                     self.player = Player((x,y), self.all_sprites, self.collision_sprites)
+                elif column == 'E':
+                    self.mob = Enemy((x,y), self.all_sprites)
+                
 
     def run(self):
         

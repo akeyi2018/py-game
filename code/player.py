@@ -25,7 +25,7 @@ class Player(pg.sprite.Sprite):
 
         self.hitbox_rect = self.rect.inflate(-30,-50)
 
-        # # movement
+        # movement
         self.direction = pg.Vector2(0,0)
         self.speed = 256
 
