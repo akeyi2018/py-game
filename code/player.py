@@ -23,14 +23,13 @@ class Player(pg.sprite.Sprite):
         # get_frectでないとバグがある
         self.rect = self.crop_img.get_frect(center = pos)
 
-        # self.hitbox_rect = self.rect.inflate(-30,-30)
+        self.hitbox_rect = self.rect.inflate(-30,-50)
 
         # # movement
         self.direction = pg.Vector2(0,0)
-        self.speed = 128
+        self.speed = 256
 
-
-        # self.collision_sprites = collision_sprites
+        self.collision_sprites = collision_sprites
 
     def crop_character_frames(self, image_path):
         """
@@ -86,11 +85,17 @@ class Player(pg.sprite.Sprite):
         self.direction = self.direction.normalize() if self.direction else self.direction
     
     def move(self, dt):
-        # directionに基づいて移動
-        self.rect.x += self.direction.x * self.speed * (dt) 
+         # directionに基づいて移動
+        self.rect.x += self.direction.x * self.speed * (dt)
+        self.hitbox_rect.centerx = self.rect.centerx  # ヒットボックスを同期
+        self.collision('horizontal')
+
         self.rect.y += self.direction.y * self.speed * (dt)
+        self.hitbox_rect.centery = self.rect.centery  # ヒットボックスを同期
+        self.collision('vertical')
         
-    def collision(self,direction):
+    def collision(self, direction):
+
         for sprite in self.collision_sprites:
             if sprite.rect.colliderect(self.hitbox_rect):
                 if direction == 'horizontal':
@@ -99,6 +104,9 @@ class Player(pg.sprite.Sprite):
                 elif direction == 'vertical':
                     if self.direction.y > 0: self.hitbox_rect.bottom = sprite.rect.top
                     if self.direction.y < 0: self.hitbox_rect.top = sprite.rect.bottom
+        
+        # 衝突結果を self.rect に反映
+        self.rect.center = self.hitbox_rect.center
 
     def animate(self, dt):
 

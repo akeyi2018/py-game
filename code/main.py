@@ -3,7 +3,7 @@ from settings import *
 from os.path import join
 from groups import AllSprites
 from player import Player
-from sprites import Sprite
+from sprites import Sprite, CollisionSprite
 
 class main:
     def __init__(self):
@@ -40,7 +40,7 @@ class main:
 
     def set_sprites_layer(self):
         self.grass = pg.image.load(join('../maps','grass.png'))
-        self.block = pg.image.load(join('../maps','block.png'))
+        self.block = pg.image.load(join('../maps','block.png')).convert_alpha()
         for i, row in enumerate(TILE_MAP):
             for j, column in enumerate(row):
                 x = j * TILE
@@ -48,7 +48,7 @@ class main:
                 # バックグランド
                 Sprite((x,y), self.grass, self.all_sprites)
                 if column == 'B':
-                    Sprite((x,y), self.block, self.all_sprites)
+                    CollisionSprite((x,y), self.block, self.all_sprites, self.collision_sprites)
                 elif column == 'P':
                     self.player = Player((x,y), self.all_sprites, self.collision_sprites)
 
