@@ -31,7 +31,6 @@ class main:
         # self.all_sprites.add(self.player.surf)
 
 
-
     def run(self):
         
         # ゲーム速度
@@ -42,17 +41,17 @@ class main:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     self.running = False
-            
-            
+
+
+            # update 
+            # キャラクター移動更新
+            self.player.update(dt)
 
             # draw
             self.main_screen.fill(BLUE)
 
             # メイン画面にキャラクターを追加描画する
-            self.main_screen.blit(self.player.surf)
-
-            # update
-            self.player.update(dt)
+            self.main_screen.blit(self.player.surf, self.player.rect)
             
 
             pg.display.update()
