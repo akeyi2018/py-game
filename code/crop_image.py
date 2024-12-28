@@ -12,7 +12,7 @@ class BackGround(pg.sprite.Sprite):
         self.full_image = pg.image.load(join('../maps', 'base_map.png')).convert_alpha()
 
         # 切り取る範囲を指定（左上から32x32の範囲）
-        crop_rect = pg.Rect(163, 583, 32, 53)  # (x, y, width, height)
+        crop_rect = pg.Rect(1, 32, 62, 63)  # (x, y, width, height)
 
         # 切り取った部分を新しいSurfaceとして取得
         cropped_surface = self.full_image.subsurface(crop_rect).copy()

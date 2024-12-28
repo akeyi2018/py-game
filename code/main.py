@@ -32,15 +32,9 @@ class main:
         # レイヤーごとにスプライトを配置する
         self.set_sprites_layer()
 
-        # self.background_group = pg.sprite.Group()
-        # self.back_ground = BackGround()
-
-        # self.player_group = pg.sprite.Group()
-        # self.player = Player((64,64), self.player_group)
-
     def set_sprites_layer(self):
         self.grass = pg.image.load(join('../maps','grass.png'))
-        self.block = pg.image.load(join('../maps','block.png')).convert_alpha()
+        self.block = pg.image.load(join('../maps','tree.png')).convert_alpha()
         for i, row in enumerate(TILE_MAP):
             for j, column in enumerate(row):
                 x = j * TILE
@@ -51,12 +45,6 @@ class main:
                     CollisionSprite((x,y), self.block, self.all_sprites, self.collision_sprites)
                 elif column == 'P':
                     self.player = Player((x,y), self.all_sprites, self.collision_sprites)
-
-
-    def draw_background(self):
-        for x, y in self.background_sprites:
-            tile_image = pg.image.load('../maps/base_tile.png').convert()
-            self.main_screen.blit(tile_image, (x, y))
 
     def run(self):
         
@@ -74,9 +62,6 @@ class main:
             # draw
             self.main_screen.fill(BLUE)
             self.all_sprites.draw(self.player.rect.center)
-            # self.back_ground.draw(self.main_screen)
-
-            # self.player_group.draw(self.main_screen)
 
             pg.display.update()
 
