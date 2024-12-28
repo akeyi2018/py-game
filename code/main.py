@@ -27,8 +27,24 @@ class main:
 
         # sprites
         self.player = Player((400,300))
+
+        # map
+        # self.create_map()
         
         # self.all_sprites.add(self.player.surf)
+
+    def create_map(self):
+        for i, row in enumerate(TILE_MAP):
+            for j, column in enumerate(row):
+                pass
+                
+                # if column == 'B':
+                #     Block(self, j, i)
+                # if column == 'P':
+                #     Player(self, j, i)
+                # if column == 'E':
+                #     Mob(self, j, i)
+
 
 
     def run(self):

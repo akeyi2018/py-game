@@ -7,14 +7,17 @@ from os import walk
 class Player(pg.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
-        # self.load_images()
-        # self.image = pg.image.load(join('./img','F1.png')).convert_alpha()
+
+        self.image = pg.image.load(join('../img', 'char.png')).convert_alpha()
+        self.crop_rect = pg.Rect(0,0,52,76)
+         # 切り抜き用のサーフェスを作成して描画
+        self.crop_img = pg.Surface(self.crop_rect.size, pg.SRCALPHA)  # 透過対応
+        self.crop_img.blit(self.image, (0, 0), self.crop_rect)  # 切り抜きを適用
+
+        self.surf = self.crop_img
+
         # get_frectでないとバグがある
-        # self.rect = self.image.get_frect(center = pos)
-        # self.state, self.frame_index = 'up', 0
-        self.image = pg.image.load(join('../img', 'player', 'down', '0.png')).convert_alpha()
-        self.surf = self.image
-        self.rect = self.image.get_frect(center = pos)
+        self.rect = self.crop_img.get_frect(center = pos)
 
         # self.hitbox_rect = self.rect.inflate(-30,-30)
 
@@ -41,32 +44,7 @@ class Player(pg.sprite.Sprite):
         self.direction.y = int(keys[pg.K_DOWN]) - int(keys[pg.K_UP])
         
         self.direction = self.direction.normalize() if self.direction else self.direction
-    #     print(f'x:{self.direction.x}')
-
-    # def input(self):
-    #     keys = pg.key.get_pressed()
-
-    #     # キーが押された場合のみ方向を更新
-    #     if keys[pg.K_RIGHT]:
-    #         self.direction.x = 1
-    #     elif keys[pg.K_LEFT]:
-    #         self.direction.x = -1
-    #     else:
-    #         self.direction.x = 0
-
-    #     if keys[pg.K_DOWN]:
-    #         self.direction.y = 1
-    #     elif keys[pg.K_UP]:
-    #         self.direction.y = -1
-    #     else:
-    #         self.direction.y = 0
-
-    #     # 正規化（斜め移動時の速度調整）
-    #     if self.direction.magnitude() > 0:
-    #         self.direction = self.direction.normalize()
-
-
-
+    
     def move(self, dt):
         # directionに基づいて移動
         self.rect.x += self.direction.x * self.speed * dt
