@@ -5,7 +5,7 @@ from os import walk
 
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, pos, groups):
+    def __init__(self, pos, groups, collision_sprites):
         super().__init__(groups)
 
         self.frames = self.crop_character_frames(join('../img', 'char.png'))

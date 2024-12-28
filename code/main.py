@@ -1,9 +1,9 @@
 import pygame as pg
 from settings import *
 from os.path import join
-
+from groups import AllSprites
 from player import Player
-from sprites import BackGround
+from sprites import Sprite
 
 class main:
     def __init__(self):
@@ -23,13 +23,35 @@ class main:
         self.running = True
 
         # group
-        self.background_group = pg.sprite.Group()
-        self.back_ground = BackGround()
+        # すべてのスプライト
+        self.all_sprites = AllSprites()
 
-        self.player_group = pg.sprite.Group()
-        self.player = Player((64,64), self.player_group)
-        
-        # self.all_sprites.add(self.player.surf)
+        # 衝突用スプライトグループ
+        self.collision_sprites = pg.sprite.Group()
+
+        # レイヤーごとにスプライトを配置する
+        self.set_sprites_layer()
+
+        # self.background_group = pg.sprite.Group()
+        # self.back_ground = BackGround()
+
+        # self.player_group = pg.sprite.Group()
+        # self.player = Player((64,64), self.player_group)
+
+    def set_sprites_layer(self):
+        self.grass = pg.image.load(join('../maps','grass.png'))
+        self.block = pg.image.load(join('../maps','block.png'))
+        for i, row in enumerate(TILE_MAP):
+            for j, column in enumerate(row):
+                x = j * TILE
+                y = i * TILE
+                # バックグランド
+                Sprite((x,y), self.grass, self.all_sprites)
+                if column == 'B':
+                    Sprite((x,y), self.block, self.all_sprites)
+                elif column == 'P':
+                    self.player = Player((x,y), self.all_sprites, self.collision_sprites)
+
 
     def draw_background(self):
         for x, y in self.background_sprites:
@@ -46,15 +68,15 @@ class main:
                 if event.type == pg.QUIT:
                     self.running = False
 
-            # キャラクター移動更新
-            self.player.update(dt)
+            # update
+            self.all_sprites.update(dt)
 
             # draw
             self.main_screen.fill(BLUE)
-            
-            self.back_ground.draw(self.main_screen)
+            self.all_sprites.draw(self.player.rect.center)
+            # self.back_ground.draw(self.main_screen)
 
-            self.player_group.draw(self.main_screen)
+            # self.player_group.draw(self.main_screen)
 
             pg.display.update()
 
