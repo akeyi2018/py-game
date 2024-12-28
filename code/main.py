@@ -3,7 +3,7 @@ from settings import *
 from os.path import join
 
 from player import Player
-from sprites import Sprite
+from sprites import BackGround
 
 class main:
     def __init__(self):
@@ -23,52 +23,38 @@ class main:
         self.running = True
 
         # group
-        # self.all_sprites = pg.sprite.Group()
+        self.background_group = pg.sprite.Group()
+        self.back_ground = BackGround()
 
-        # sprites
-        self.player = Player((400,300))
-
-        # map
-        # self.create_map()
+        self.player_group = pg.sprite.Group()
+        self.player = Player((64,64), self.player_group)
         
         # self.all_sprites.add(self.player.surf)
 
-    def create_map(self):
-        for i, row in enumerate(TILE_MAP):
-            for j, column in enumerate(row):
-                pass
-                
-                # if column == 'B':
-                #     Block(self, j, i)
-                # if column == 'P':
-                #     Player(self, j, i)
-                # if column == 'E':
-                #     Mob(self, j, i)
-
-
+    def draw_background(self):
+        for x, y in self.background_sprites:
+            tile_image = pg.image.load('../maps/base_tile.png').convert()
+            self.main_screen.blit(tile_image, (x, y))
 
     def run(self):
         
         # ゲーム速度
         dt = self.clock.tick(FPS) / 1000
-
         while self.running:
             # イベント処理
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     self.running = False
 
-
-            # update 
             # キャラクター移動更新
             self.player.update(dt)
 
             # draw
             self.main_screen.fill(BLUE)
-
-            # メイン画面にキャラクターを追加描画する
-            self.main_screen.blit(self.player.surf, self.player.rect)
             
+            self.back_ground.draw(self.main_screen)
+
+            self.player_group.draw(self.main_screen)
 
             pg.display.update()
 

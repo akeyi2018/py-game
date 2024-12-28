@@ -4,7 +4,7 @@ TITLE = "RPG Game"
 MAIN_WIDTH, MAIN_HEIGHT = 1280, 720
 FPS = 60
 FONT_NAME = 'arial'
-TILE = 32
+TILE = 64
 
 # Player properties
 PLAYER_ACC = 0.5

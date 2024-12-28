@@ -5,8 +5,8 @@ from os import walk
 
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, pos):
-        super().__init__()
+    def __init__(self, pos, groups):
+        super().__init__(groups)
 
         self.frames = self.crop_character_frames(join('../img', 'char.png'))
         self.state = 'down'
@@ -27,7 +27,7 @@ class Player(pg.sprite.Sprite):
 
         # # movement
         self.direction = pg.Vector2(0,0)
-        self.speed = 15
+        self.speed = 64
 
 
         # self.collision_sprites = collision_sprites
@@ -49,6 +49,10 @@ class Player(pg.sprite.Sprite):
         frame_width = 208 // 4  # 横方向のコマ数
         frame_height = 304 // 4  # 縦方向のコマ数
 
+        # # リサイズ後のサイズ
+        # resized_frame_width = frame_width // 2
+        # resized_frame_height = frame_height // 2
+
         # 切り抜き領域を計算して保存
         directions = ['down', 'left', 'right', 'up']
         frames = {direction: [] for direction in directions}
@@ -63,6 +67,11 @@ class Player(pg.sprite.Sprite):
                 cropped_surface = pg.Surface((frame_width, frame_height), pg.SRCALPHA)
                 cropped_surface.blit(image, (0, 0), crop_rect)
 
+                # # サイズを半分にリサイズ
+                # resized_surface = pg.transform.scale(
+                #     cropped_surface, (resized_frame_width, resized_frame_height)
+                # )
+
                 # フレームをリストに追加
                 frames[direction].append(cropped_surface)
 
@@ -75,13 +84,11 @@ class Player(pg.sprite.Sprite):
         self.direction.y = int(keys[pg.K_DOWN]) - int(keys[pg.K_UP])
         
         self.direction = self.direction.normalize() if self.direction else self.direction
-
-        # print(f'Direction: {self.direction}, State: {self.state}')
     
     def move(self, dt):
         # directionに基づいて移動
-        self.rect.x += self.direction.x * self.speed * dt
-        self.rect.y += self.direction.y * self.speed * dt
+        self.rect.x += self.direction.x * self.speed * (dt) 
+        self.rect.y += self.direction.y * self.speed * (dt)
         
     def collision(self,direction):
         for sprite in self.collision_sprites:
