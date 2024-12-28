@@ -27,7 +27,7 @@ class Player(pg.sprite.Sprite):
 
         # # movement
         self.direction = pg.Vector2(0,0)
-        self.speed = 64
+        self.speed = 128
 
 
         # self.collision_sprites = collision_sprites
