@@ -30,13 +30,20 @@ class main:
         # 衝突用スプライトグループ
         self.collision_sprites = pg.sprite.Group()
 
-        # レイヤーごとにスプライトを配置する
+        # 敵スプライトグループ
+        self.enemy_sprites = pg.sprite.Group()
+
+        # レイヤーごとにスプライトを配置する(Mapロード)
+        self.current_map_name = 'map_01'
+        self.current_map = TILE_MAP[self.current_map_name]
         self.set_sprites_layer()
+
+        # self.debug_sprite_groups()
 
     def set_sprites_layer(self):
         self.grass = pg.image.load(join('../maps','grass.png'))
         self.block = pg.image.load(join('../maps','tree.png')).convert_alpha()
-        for i, row in enumerate(TILE_MAP):
+        for i, row in enumerate(self.current_map):
             for j, column in enumerate(row):
                 x = j * TILE
                 y = i * TILE
@@ -45,10 +52,18 @@ class main:
                 if column == 'B':
                     CollisionSprite((x,y), self.block, self.all_sprites, self.collision_sprites)
                 elif column == 'P':
-                    self.player = Player((x,y), self.all_sprites, self.collision_sprites)
+                    self.player = Player(
+                        (x,y),
+                        self.current_map, 
+                        self.all_sprites, 
+                        self.collision_sprites, 
+                        self.enemy_sprites)
                 elif column == 'E':
-                    self.mob = Enemy((x,y), self.all_sprites)
-                
+                    self.mob = Enemy((x,y), column, self.all_sprites, self.enemy_sprites)
+                elif column == 'F':
+                    self.mob = Enemy((x,y), column, self.all_sprites, self.enemy_sprites)
+                elif column == 'G':
+                    self.mob = Enemy((x,y), column, self.all_sprites, self.enemy_sprites)
 
     def run(self):
         
@@ -62,6 +77,10 @@ class main:
 
             # update
             self.all_sprites.update(dt)
+            self.transition = self.player.check_map_transition()
+
+            if self.transition:
+                print(self.transition)
 
             # draw
             self.main_screen.fill(BLUE)

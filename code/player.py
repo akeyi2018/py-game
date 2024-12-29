@@ -5,12 +5,14 @@ from os import walk
 
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, pos, groups, collision_sprites):
+    def __init__(self, pos, current_map, groups, collision_sprites, enemy_sprites):
         super().__init__(groups)
 
         self.frames = self.crop_character_frames(join('../img', 'char.png'))
         self.state = 'down'
         self.frame_index = 0
+        
+        self.current_map = current_map
 
         self.image = pg.image.load(join('../img', 'char.png')).convert_alpha()
         self.crop_rect = pg.Rect(0,0,52,76)
@@ -30,6 +32,7 @@ class Player(pg.sprite.Sprite):
         self.speed = 256
 
         self.collision_sprites = collision_sprites
+        self.enemy_sprites = enemy_sprites
 
     def crop_character_frames(self, image_path):
         """
@@ -104,6 +107,13 @@ class Player(pg.sprite.Sprite):
                 elif direction == 'vertical':
                     if self.direction.y > 0: self.hitbox_rect.bottom = sprite.rect.top
                     if self.direction.y < 0: self.hitbox_rect.top = sprite.rect.bottom
+            
+
+        for sprite in self.enemy_sprites:
+            if sprite.rect.colliderect(self.hitbox_rect):
+
+                print(f"Enemy に衝突: {sprite.enemy_type}")
+
         
         # 衝突結果を self.rect に反映
         self.rect.center = self.hitbox_rect.center
@@ -127,6 +137,26 @@ class Player(pg.sprite.Sprite):
         # 現在のフレーム画像を設定
         self.image = self.frames[self.state][int(self.frame_index)]
         self.surf = self.image
+    
+
+    def check_map_transition(self):
+        """
+        プレイヤーの位置を監視し、マップ遷移をチェックする
+        """
+        # print(f'R:{self.rect.right} SIZE:{self.current_map}')
+        # 左端
+        if self.rect.left < 0:
+            return "left"  # 左マップへ遷移
+        # 右端
+        elif self.rect.right > TILE * len(self.current_map[0]):
+            return "right"  # 右マップへ遷移
+        # 上端
+        elif self.rect.top < 0:
+            return "up"  # 上マップへ遷移
+        # 下端
+        elif self.rect.bottom > TILE * len(self.current_map):
+            return "down"  # 下マップへ遷移
+        return None  # 遷移なし
 
     def update(self, dt):
         self.input()
