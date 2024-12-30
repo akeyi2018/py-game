@@ -95,11 +95,13 @@ class main:
             self.transition = self.player.check_map_transition()
 
             if self.transition:
-                # print(self.transition)
-                print()
+                # 遷移先のマップ名と初期位置を取得
                 self.after_transition_name, player_start_pos = MAP_CONNECTIONS[self.current_map_name][self.transition]
+                # 遷移後のマップをセット
                 self.current_map = TILE_MAP[self.after_transition_name]
+                # 遷移後のマップ名を変更する
                 self.current_map_name = self.after_transition_name
+                # マップを再読み込みする
                 self.set_sprites_layer(player_start_pos)
 
             # draw

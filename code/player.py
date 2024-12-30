@@ -143,7 +143,7 @@ class Player(pg.sprite.Sprite):
         """
         プレイヤーの位置を監視し、マップ遷移をチェックする
         """
-        print(f'X:{self.rect.x} Y:{self.rect.y}')
+        # print(f'X:{self.rect.x} Y:{self.rect.y}')
         # 左端
         if self.rect.left < 0:
             return "left"  # 左マップへ遷移
