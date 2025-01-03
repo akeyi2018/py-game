@@ -15,7 +15,8 @@ BLOCK_PATH = '../maps/block1.png'
 
 TILE_SIZE = 64
 MAX_ENEMY_NUM = 5
-NON_ENEMY_AREA = 3 
+NON_ENEMY_AREA = 2
+MOB_AREA = 2 
 TILE = {
     "map_01": [
         'BBBBBBBBBBBBBBBBBBB',

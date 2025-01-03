@@ -15,22 +15,37 @@ class Block(pg.sprite.Sprite):
         self.rect = self.surface.get_frect(topleft=pos)
 
 class Enemy(pg.sprite.Sprite):
-    def __init__(self, pos, enemy_obj, enemy_sprites):
+    def __init__(self, pos, id, mob_pos, enemy_sprites):
         super().__init__(enemy_sprites)
 
         # イメージの読み込み
-        self.enemy_obj = enemy_obj
+        self.enemy_obj = [
+            {
+                "name": "bat",
+                "path": "../img/enemy/e001.png"
+            },
+            {
+                "name": "sneck",
+                "path": "../img/enemy/e002.png"
+            },
+            {
+                "name": "サソリ",
+                "path": "../img/enemy/e003.png"
+            },
+        ]
+
+        self.id = id
+        # 論理配置
+        self.mob_pos = mob_pos
         # name
-        self.name = self.enemy_obj['name']
-        self.surface = pg.image.load(self.enemy_obj['path']).convert_alpha()
+        self.name = self.enemy_obj[self.id]['name']
+        self.surface = pg.image.load(self.enemy_obj[self.id]['path']).convert_alpha()
         self.surface = pg.transform.scale(self.surface, (64, 64))
-        # 位置
+        # 画面での位置
         self.pos = pos
         # rect
         self.rect = self.surface.get_frect(topleft=pos)
     
-    def general_enemy(self):
-        # Pの周囲に配置しないように最低限なマス数を決める
-        non_enemy_area = 4
+    
 
-        # 敵を配置可能かどうか判定結果Listを作成
+

@@ -2,26 +2,10 @@ import pygame as pg
 from settings import *
 from wall import Block, Enemy
 from player import Player
-
 import random
 
 class Map(pg.sprite.Sprite):
     def __init__(self, collision_sprites, enemy_sprites):
-
-        self.enemy_obj = [
-            {
-                "name": "bat",
-                "path": "../img/enemy/e001.png"
-            },
-            {
-                "name": "sneck",
-                "path": "../img/enemy/e002.png"
-            },
-            {
-                "name": "サソリ",
-                "path": "../img/enemy/e003.png"
-            },
-        ]
 
         self.block_images = {
             "B" : "../maps/tree.png"
@@ -34,6 +18,8 @@ class Map(pg.sprite.Sprite):
 
         self.map_list = []
         self.enemy_list = []
+        # mob配置はキューで管理する
+        self.mob_pos_info = []
         self.player = None
 
     def create(self):
@@ -53,10 +39,12 @@ class Map(pg.sprite.Sprite):
         # 敵の配置
         self.create_enemy()
 
-        return self.player, self.map_list, self.enemy_list
+        # 
+        self.base_map = self.get_base_map()
+        return self.player, self.map_list, self.enemy_list, self.mob_pos_info, self.current_map
     
     def create_enemy(self):
-        enemy_count = 0
+        id = 0 #生成時作業用ID
         # 敵の配置
         self.replace_zeros_with_nines()
         for i, row in enumerate(self.grid):
@@ -66,13 +54,16 @@ class Map(pg.sprite.Sprite):
                 y = i * TILE_SIZE
                 if column == 9:
                     print(f'x:{j} y:{i}に{column}を配置')
+                    self.mob_pos_info.append([j,i])
 
-                    self.enemy = Enemy((x,y), self.enemy_obj[enemy_count], self.enemy_sprites)
-                    enemy_count += 1
-                    if enemy_count >2: enemy_count = 0
+                    self.enemy = Enemy((x,y), id, [j,i], self.enemy_sprites)
+
+                    id += 1
+                    if id >2: id = 0
                     self.enemy_list.append(self.enemy)
+        # print(self.mob_pos_info)
 
-    def cal_player_area(self):
+    def cal_player_area(self, max_y, max_x):
         # px 
         px = -1
         py = -1
@@ -84,18 +75,23 @@ class Map(pg.sprite.Sprite):
                     break
 
         # NONエリアの計算
-        px_min = px - NON_ENEMY_AREA
-        if px_min <= 0: px_min = 0 
-        px_max = px + NON_ENEMY_AREA
-        py_min = py - NON_ENEMY_AREA
-        if py_min <= 0: py_min = 0
-        py_max = py + NON_ENEMY_AREA
+        px_min = max(0, px - NON_ENEMY_AREA)
+        px_max = min(max_x - 1, px + NON_ENEMY_AREA)
+        py_min = max(0, py - NON_ENEMY_AREA)
+        py_max = min(max_y - 1, py + NON_ENEMY_AREA)
 
         return px_min, px_max, py_min, py_max
         
     def cal_non_enemy_area(self):
+
+        map_data = self.get_base_map()
+        # mapデータの最大値を取得する
+        max_map_y = len(map_data)
+        max_map_x = len(map_data[0])
+
         # Playerエリアの計算
-        px_min, px_max, py_min, py_max = self.cal_player_area()
+        px_min, px_max, py_min, py_max = self.cal_player_area(max_map_x, max_map_y)
+
         # 敵を配置できるエリアの取得
         self.loc_enemy_area = []
         for i, row in enumerate(self.current_map):
@@ -131,3 +127,15 @@ class Map(pg.sprite.Sprite):
         for i, j in random_positions:
             self.grid[i][j] = 9
 
+    def get_base_map(self):
+        base_map = []
+        for i, row in enumerate(self.current_map):
+            row_area = []
+            for j, column in enumerate(row):
+                if column == 'B':
+                    row_area.append(1) 
+                else:
+                    row_area.append(0)
+            base_map.append(row_area)
+
+        return base_map

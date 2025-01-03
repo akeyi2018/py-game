@@ -24,10 +24,8 @@ class game:
         self.game_stage = 'main'
 
         # Map
-        self.player, self.map_list, self.enemy_list = Map(
-            self.collision_sprites,
-            self.enemy_sprites,
-            ).create()
+        self.player, self.map_list, self.enemy_list, self.mob_pos_info, self.current_map = Map(
+            self.collision_sprites,self.enemy_sprites).create()
         
     def events(self):
         # イベント処理
@@ -36,7 +34,7 @@ class game:
                 self.running = False
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                     self.player.game_stage = "main"  # 状態を"main"に戻す
-                    print(f'player pos: x:{int(self.player.rect.centerx/TILE_SIZE)}, y:{int(self.player.rect.centery/TILE_SIZE)}')
+                    # print(f'player pos: x:{int(self.map.player.rect.centerx/TILE_SIZE)}, y:{int(self.map.player.rect.centery/TILE_SIZE)}')
 
     def main_screen(self, dt):
         # draw
@@ -54,7 +52,7 @@ class game:
         self.display_surface.blit(self.player.surface,self.player.rect)
 
         # player Update
-        self.player.update(dt, self.enemy_list)
+        self.player.update(dt, self.enemy_list, self.mob_pos_info, self.current_map)
 
     def battle_screen(self):
         pg.display.set_caption('Battle')
