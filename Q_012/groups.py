@@ -1,0 +1,17 @@
+from settings import * 
+import pygame as pg
+
+
+class AllSprites(pg.sprite.Group):
+    def __init__(self, *sprites):
+        super().__init__(*sprites)
+        
+        # display
+        self.display_surface = pg.display.get_surface()
+
+        self.offset =pg.Vector2()
+
+    def draw(self):
+
+        for sprite in self:
+            self.display_surface.blit(sprite.surface, sprite.rect.topleft)
