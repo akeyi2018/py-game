@@ -5,7 +5,7 @@ from player import Player
 import random
 
 class Map(pg.sprite.Sprite):
-    def __init__(self, all_sprites, enemy_sprites, *groups):
+    def __init__(self, all_sprites, *groups):
         super().__init__(*groups)
 
         self.block_images = {
@@ -17,7 +17,7 @@ class Map(pg.sprite.Sprite):
         # 通過不可Sprite
         self.collision_sprites = pg.sprite.Group()
 
-        self.enemy_sprites = enemy_sprites
+        self.enemy_sprites = pg.sprite.Group()
 
         self.all_sprites = all_sprites
 

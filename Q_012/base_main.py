@@ -19,13 +19,13 @@ class game:
         # all sprite
         self.all_sprites = AllSprites()
  
-        # Enemy Sprite
-        self.enemy_sprites = pg.sprite.Group()
+        # # Enemy Sprite
+        # self.enemy_sprites = pg.sprite.Group()
 
         self.game_stage = 'main'
 
         # Map
-        self.player, self.current_map = Map(self.all_sprites, self.enemy_sprites).create()
+        self.player, self.current_map = Map(self.all_sprites).create()
         
     def events(self):
         # イベント処理
