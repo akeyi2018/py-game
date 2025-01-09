@@ -7,7 +7,8 @@ class Battle(pg.sprite.Sprite):
     def __init__(self, battle_sprites):
         super().__init__()
         self.display_surface = pg.display.get_surface()
-        self.back_ground_img = pg.transform.scale(pg.image.load('../battle/bg.png'), (819, HEIGHT))
+        self.back_ground_img = pg.image.load('../battle/bg.png')
+        self.back_ground_img = pg.transform.scale(self.back_ground_img, (819, HEIGHT))
 
         self.bg_size = self.back_ground_img.get_size()
 
@@ -24,12 +25,15 @@ class Battle(pg.sprite.Sprite):
 
         px = 30
         py = 30
+        pos_y = [30, 130, 530]
         btn_width = 100
         btn_height = 40
         self.main_buttons = [
-            Button(px, py, btn_width,btn_height, "攻撃", self.attack),
-            Button(px, py + 50, btn_width,btn_height, "魔法", self.show_sub_commands),
-            Button(px, py + 500, btn_width,btn_height, "逃げる", self.escape)
+            Button(px, pos_y[i], btn_width, btn_height, name, action)
+            for i, (name, action) in enumerate([
+                ("攻撃", self.attack), 
+                ("魔法", self.show_sub_commands), 
+                ("逃げる", self.escape)])
         ]        
 
         px = 30
@@ -53,8 +57,6 @@ class Battle(pg.sprite.Sprite):
     def draw_background(self, screen):
         self.screen = screen
         self.screen.fill((0, 0, 0))
-        self.back_ground_img = pg.transform.scale(pg.image.load('../battle/bg.png'), (819, HEIGHT))
-        self.rect = self.back_ground_img.get_frect()
         self.screen.blit(self.back_ground_img, self.rect.topleft + self.off_set)
 
     def draw(self, player, screen):
@@ -111,8 +113,6 @@ class Battle(pg.sprite.Sprite):
     
     def draw_menu_backgroud(self):
         pg.draw.rect(self.display_surface, '#8E7698', [2, 2, self.off_set.x -2, HEIGHT-2])
-        # pg.draw.rect(self.display_surface, (255, 255, 255), [0, 0, self.off_set.x, HEIGHT],5,border_radius=5)
-        # pg.color = '#D3DED0'
         pg.draw.rect(self.display_surface,'#D3DED0', [0, 0, self.off_set.x, HEIGHT],5,border_radius=5)
 
     # 描画
