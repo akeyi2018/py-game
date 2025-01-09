@@ -34,8 +34,6 @@ class Button:
 
     def check_click(self, mouse_pos):
         return self.rect.collidepoint(mouse_pos)
-
-
     
 class TextSprite(pg.sprite.Sprite):
     def __init__(self, text, font, color, x, y, all_sprites):
@@ -50,14 +48,8 @@ class TextSprite(pg.sprite.Sprite):
         self.all_sprites = all_sprites
         self.all_sprites.add(self)
 
-    def update_text(self, new_text, alpha):
-        """テキストを更新"""
-        # 枠線を再描画
-        self.text = new_text
-        self.alpha = alpha
-        if self.alpha >= 255: self.alpha = 0
-        self.image = self.font.render(self.text, True, self.color, (0,0,255))
+    def update_message(self, screen, message):
+        self.screen = screen
+        self.text = message
+        self.image = self.font.render(self.text, True, self.color)
         self.surface = self.image
-        self.image.set_alpha(self.alpha)
-        # pg.draw.rect(self.image, (0,255,0), [0,0,400,100],3, border_radius=5)
-        # pg.draw.rect(self.image, (255, 255, 255), [0,0, 400,100], 3, border_radius=5)

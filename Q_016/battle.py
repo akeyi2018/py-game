@@ -1,9 +1,9 @@
 import pygame as pg
 from settings import *
-from utils import Button, Popup, TextSprite
+from utils import Button, TextSprite
 
 class Battle(pg.sprite.Sprite):
-    def __init__(self, all_sprites):
+    def __init__(self, battle_sprites):
         super().__init__()
         self.display_surface = pg.display.get_surface()
         self.back_ground_img = pg.transform.scale(pg.image.load('../battle/bg.png'), (819, 614))
@@ -17,10 +17,9 @@ class Battle(pg.sprite.Sprite):
 
         self.font = pg.font.Font("../battle/Meiryo.ttf", 24)
         self.battle_message = []
-        self.mob_surface = None
+        self.surface = None
 
-        self.show_popup = False  # ポップアップ表示フラグ
-        self.popup = self.show_popup_message()
+        self.enemy = None
 
         px = 30
         py = 30
@@ -42,61 +41,50 @@ class Battle(pg.sprite.Sprite):
 
         self.currend_command = self.main_buttons
 
-        self.all_sprites = all_sprites
-        self.text_sprites = TextSprite('', self.font, (255,255,255), 250, 430, self.all_sprites)
+        self.battle_sprites = battle_sprites
+        self.text_sprites = TextSprite('', self.font, (255,255,255), 250, 430, self.battle_sprites)
 
         pg.display.set_caption('Battle')
 
-    def draw(self, player):
-        
-        enemy = player.collided_enemy
+    def draw_background(self, screen):
+        self.screen = screen
+        self.screen.fill((0, 0, 0))
+        self.back_ground_img = pg.transform.scale(pg.image.load('../battle/bg.png'), (819, 614))
+        self.rect = self.back_ground_img.get_frect()
+        self.screen.blit(self.back_ground_img, self.rect.topleft + self.off_set)
+
+    def draw(self, player, screen):
+        self.draw_background(screen)
+        self.enemy = player.collided_enemy
         self.mob_pos =  ((WIDTH - 128) /2,HEIGHT /8)
-        self.mob_surface = enemy.battle_surface.copy()
-        self.display_surface.blit(enemy.battle_surface, self.mob_pos)
-        
+        self.mob_surface = self.enemy.battle_surface.copy()
         # メッセージ
-        message_str = f'{enemy.name}が現れました!' 
-        self.battle_message.append(message_str)
-        
-        self.draw_text()
+        self.battle_message.append(f'{self.enemy.name}が現れました!') 
+        self.render_scene(screen)
 
-    def initial_action(self):
-        self.fade_text()
-        self.clear_text_area()
-        self.check_message()
+    def render_scene(self, screen):
+        self.draw_background(screen)
+        self.display_surface.blit(self.enemy.battle_surface, self.mob_pos)
 
-    def check_message(self):
+        self.draw_background_text_area()
+        self.draw_text(screen)
+        self.draw_menu_backgroud()
+
+    def update_message(self, screen):
+        self.render_scene(screen)
+
+    def set_message(self):
         if len(self.battle_message) > 5:
             del self.battle_message[0]
 
-    def fade_text(self):
-        for alpha in range(0, 120, 5):
-            # self.display_surface.fill((0, 0, 0))
-            temp_surface = self.back_ground_img.copy()
-            temp_surface.set_alpha(alpha)
-            self.display_surface.blit(temp_surface, self.rect.topleft + self.off_set)
-            self.display_surface.blit(self.mob_surface, self.mob_pos)
-            pg.display.flip()
-            pg.time.delay(1)
-
-    def draw_text(self):
-        # テキストを描画
-        self.initial_action()
-
-        self.check_message()
         view_message = ['  ' + item for item in self.battle_message]
-        view_message = '\n'.join(view_message)
+        return '\n'.join(view_message)
 
-        # self.text_sprites.update_text(view_message, 128)
+    def draw_text(self, screen):
+        self.text_sprites.update_message(screen, self.set_message())
 
-        
-        self.text_surface = self.font.render(view_message, True, (255, 255, 255))  # 白色でテキストを描画
-        self.display_surface.blit(self.text_surface, (255, 432))
-
-    def clear_text_area(self):
+    def draw_background_text_area(self):
         """必要最小限の透明マスクを新規作成し、配置する"""
-
-        # テキスト描画用の最小領域を定義
         self.text_area_rect = pg.Rect(250, 430, self.bg_size[0] * 0.95, self.bg_size[1] * 0.3)
 
         # 半透明の背景色を設定
@@ -138,56 +126,22 @@ class Battle(pg.sprite.Sprite):
             for button in self.currend_command:
                 if button.check_click(mouse_pos):  # ボタンがクリックされたか判定
                     button.action()  # ボタンに設定された関数を呼び出し
-
-    def show_popup_message(self):
-        # ポップアップを表示する
-        # self.show_popup = True
-        self.popup = Popup(
-            screen=self.display_surface,
-            text="Button Clicked!",
-            rect=(0, 200, self.off_set.x, HEIGHT-200),
-            bg_color=(0, 0, 200),
-            text_color=(125, 250, 125)
-        )
-        return self.popup
+                    return True
 
     def attack(self):
         self.battle_message.append('攻撃')
-       
-        self.draw_text()
-
-
-    def magic(self):
-        self.battle_message.append('魔法')
-       
-        self.draw_text()
-
 
     def escape(self):
         self.battle_message.append('逃げる')
-      
-        self.draw_text()
 
     def hoimi(self):
-        # print('hoimi')
         self.battle_message.append('ホイミ')
-        self.draw_text()
         self.show_main_commands()
 
     def mera(self):
         self.battle_message.append('メラ')
-        self.draw_text()
         self.show_main_commands()
 
     def hyado(self):
         self.battle_message.append('ヒャド')
-        self.draw_text()
-        self.show_main_commands() 
-
-    def fade_in(self):
-        for alpha in range(0, 125, 5):
-            temp_surface = self.back_ground_img.copy()
-            temp_surface.set_alpha(alpha)
-            self.display_surface.blit(temp_surface, self.rect.topleft + self.off_set)
-            pg.display.flip()
-            pg.time.delay(30)
+        self.show_main_commands()
