@@ -1,12 +1,13 @@
 import pygame as pg
 from settings import *
 from utils import Button, TextSprite
+from status import PlayerStatus
 
 class Battle(pg.sprite.Sprite):
     def __init__(self, battle_sprites):
         super().__init__()
         self.display_surface = pg.display.get_surface()
-        self.back_ground_img = pg.transform.scale(pg.image.load('../battle/bg.png'), (819, 614))
+        self.back_ground_img = pg.transform.scale(pg.image.load('../battle/bg.png'), (819, HEIGHT))
 
         self.bg_size = self.back_ground_img.get_size()
 
@@ -42,19 +43,21 @@ class Battle(pg.sprite.Sprite):
         self.currend_command = self.main_buttons
 
         self.battle_sprites = battle_sprites
-        self.text_sprites = TextSprite('', self.font, (255,255,255), 250, 430, self.battle_sprites)
 
-        pg.display.set_caption('Battle')
+        # player status
+        self.status = PlayerStatus(self.off_set, self.bg_size, self.battle_sprites)
+        
+        # messege
+        self.text_sprites = TextSprite('', self.font, (255,255,255),  (0,0,255), 250, 430, self.battle_sprites)
 
     def draw_background(self, screen):
         self.screen = screen
         self.screen.fill((0, 0, 0))
-        self.back_ground_img = pg.transform.scale(pg.image.load('../battle/bg.png'), (819, 614))
+        self.back_ground_img = pg.transform.scale(pg.image.load('../battle/bg.png'), (819, HEIGHT))
         self.rect = self.back_ground_img.get_frect()
         self.screen.blit(self.back_ground_img, self.rect.topleft + self.off_set)
 
     def draw(self, player, screen):
-        self.draw_background(screen)
         self.enemy = player.collided_enemy
         self.mob_pos =  ((WIDTH - 128) /2,HEIGHT /8)
         self.mob_surface = self.enemy.battle_surface.copy()
@@ -69,6 +72,10 @@ class Battle(pg.sprite.Sprite):
         self.draw_background_text_area()
         self.draw_text(screen)
         self.draw_menu_backgroud()
+
+        # player status
+        self.status.draw_status(screen)
+
 
     def update_message(self, screen):
         self.render_scene(screen)
@@ -103,8 +110,10 @@ class Battle(pg.sprite.Sprite):
 
     
     def draw_menu_backgroud(self):
-        pg.draw.rect(self.display_surface, (0, 200, 200), [2, 2, self.off_set.x -2, HEIGHT-2])
-        pg.draw.rect(self.display_surface, (255, 255, 255), [0, 0, self.off_set.x, HEIGHT],5,border_radius=5)
+        pg.draw.rect(self.display_surface, '#8E7698', [2, 2, self.off_set.x -2, HEIGHT-2])
+        # pg.draw.rect(self.display_surface, (255, 255, 255), [0, 0, self.off_set.x, HEIGHT],5,border_radius=5)
+        # pg.color = '#D3DED0'
+        pg.draw.rect(self.display_surface,'#D3DED0', [0, 0, self.off_set.x, HEIGHT],5,border_radius=5)
 
     # 描画
     def draw_buttons(self):

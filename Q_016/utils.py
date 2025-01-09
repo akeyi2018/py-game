@@ -36,12 +36,14 @@ class Button:
         return self.rect.collidepoint(mouse_pos)
     
 class TextSprite(pg.sprite.Sprite):
-    def __init__(self, text, font, color, x, y, all_sprites):
+    def __init__(self, text, font, fore_color, bg_color, x, y, all_sprites):
         super().__init__()
         self.text = text
         self.font = font
-        self.color = color
-        self.image = self.font.render(self.text, True, self.color, (0,0,255))
+        self.color = fore_color
+        self.bg_color = bg_color
+        # self.image = self.font.render(self.text, True, self.color, self.bg_color)
+        self.image = self.font.render(self.text, True, self.color)
         self.surface = self.image
         self.rect = self.image.get_rect(topleft=(x, y))
         self.alpha = 0
@@ -53,3 +55,4 @@ class TextSprite(pg.sprite.Sprite):
         self.text = message
         self.image = self.font.render(self.text, True, self.color)
         self.surface = self.image
+        # self.rect = self.surface.get_frect()

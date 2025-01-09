@@ -21,7 +21,7 @@ class game:
         # all sprite
         self.all_sprites = AllSprites()
 
-        self.battle_sprites = pg.sprite.Group()
+        self.battle_sprites = AllSprites()
 
         self.game_stage = 'main'
 
@@ -68,11 +68,11 @@ class game:
 
             # バトル画面描画
             self.battle.draw(self.player, self.display_surface)
-            self.battle_sprites.draw(self.display_surface)
+            self.battle_sprites.draw_battle()
         
         if self.update_message_flag:
             self.battle.update_message(self.display_surface)
-            self.battle_sprites.draw(self.display_surface)
+            self.battle_sprites.draw_battle()
             self.update_message_flag = False
 
         self.battle.draw_buttons()

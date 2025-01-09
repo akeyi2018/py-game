@@ -15,3 +15,8 @@ class AllSprites(pg.sprite.Group):
         pg.display.set_caption('FIELD')
         for sprite in self:
             self.display_surface.blit(sprite.surface, sprite.rect.topleft)
+
+    def draw_battle(self):
+        pg.display.set_caption('BATTLE')
+        for sprite in self:
+            self.display_surface.blit(sprite.image, sprite.rect.topleft)
