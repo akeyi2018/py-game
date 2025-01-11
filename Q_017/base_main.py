@@ -27,7 +27,7 @@ class game:
 
         # バトル管理
         self.battle = None  # BattleScreenクラスのインスタンスを保持
-        self.fade_in_done = False  # フェードイン制御フラグ
+        self.is_finished_battle = False  # フェードイン制御フラグ
         self.update_message_flag = False
 
         # バトル初期化
@@ -62,9 +62,9 @@ class game:
     def show_battle_screen(self):
 
         # フェードインがまだ完了していなければ実行
-        if not self.fade_in_done:
+        if not self.is_finished_battle:
             self.battle.battle_message = []
-            self.fade_in_done = True  # フェードイン完了を記録
+            self.is_finished_battle = True  # フェードイン完了を記録
 
             # バトル画面描画
             self.battle.draw(self.player, self.display_surface)
@@ -75,7 +75,9 @@ class game:
             self.battle_sprites.draw_battle()
             self.update_message_flag = False
 
-        self.battle.draw_buttons()
+        if self.battle.battle_active:
+            self.battle.draw_buttons()
+
 
     def events(self):
         # イベント処理
@@ -84,12 +86,13 @@ class game:
                 self.running = False
 
             elif event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
-                    self.fade_in_done = False
+                if self.battle.get_battle_result() == False:
+                    self.is_finished_battle = False
+                    self.battle.battle_active = True
                     self.player.game_stage = "main"  # 状態を"main"に戻す
             else:
                 # BattleScreenクラスのマウスイベントを処理
                 self.update_message_flag = self.battle.handle_mouse_event(event)
-
 
 if __name__ == "__main__":
     new_game = game()

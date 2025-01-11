@@ -110,6 +110,9 @@ class BattleScreen(pg.sprite.Sprite):
         # messege
         self.text_sprites = TextSprite('', self.font, (255,255,255),  (0,0,255), 250, 430, self.battle_sprites)
 
+        # Battle state
+        self.battle_active = True  # 戦闘がアクティブかどうかを管理するフラグ
+
     def get_actions(self):
         return {
             "main": [
@@ -126,9 +129,24 @@ class BattleScreen(pg.sprite.Sprite):
 
     def attack(self):
         # 攻撃力は HP* 0.8
+        damege = int(self.status.infact_status['ATK'] / 2) - int(self.enemy.mob_info['DEF']/4)
+        self.enemy.mob_info['HP'] -= damege
+        
         mes = f'{self.status.view_status['name']}は攻撃しました。' + \
-            f'{self.enemy.name}は{int(self.status.infact_status['ATK'] / 4) - int(self.enemy.mob_info['DEF']/3)}のダメージを受けました。'
+            f'{self.enemy.name}は{damege}のダメージを受けました。'
+        
         self.general_message([mes])
+        
+        if self.enemy.mob_info['HP'] <= 0:
+            mes_02 = f'{self.enemy.name}を倒しました。'
+            self.general_message([mes_02])
+            self.battle_active = False  # 戦闘終了フラグを設定
+
+    def get_battle_result(self):
+        if self.enemy.mob_info['HP'] <= 0:
+            return False
+        else:
+            return True
 
     def escape(self):
         self.battle_message.append('逃げる')
@@ -165,10 +183,15 @@ class BattleScreen(pg.sprite.Sprite):
         self.layout.draw_background_text_area()
 
         self.draw_text(screen)
+
         self.layout.draw_menu_backgroud()
 
         # player status
         self.status.draw_status(screen)
+
+        # コマンドボタンの描画（戦闘中のみ表示）
+        if self.battle_active:
+            self.menu.draw_buttons()
 
     def update_message(self, screen):
         self.render_scene(screen)
@@ -190,7 +213,11 @@ class BattleScreen(pg.sprite.Sprite):
         self.text_sprites.update_message(screen, self.set_message())
 
     def handle_mouse_event(self, event):
-        return self.menu.handle_mouse_event(event)
+        # 戦闘中のみボタンの押下処理を有効化
+        if self.battle_active:
+            return self.menu.handle_mouse_event(event)
+        return False
+        # return self.menu.handle_mouse_event(event)
     
     def draw_buttons(self):
         self.menu.draw_buttons()
