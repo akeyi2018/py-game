@@ -178,7 +178,8 @@ class BattleScreen(pg.sprite.Sprite):
     def render_scene(self, screen):
         self.layout.draw_background(screen)
 
-        self.display_surface.blit(self.enemy.battle_surface, self.mob_pos)
+        if self.battle_active:
+            self.display_surface.blit(self.enemy.battle_surface, self.mob_pos)
 
         self.layout.draw_background_text_area()
 
@@ -188,10 +189,6 @@ class BattleScreen(pg.sprite.Sprite):
 
         # player status
         self.status.draw_status(screen)
-
-        # コマンドボタンの描画（戦闘中のみ表示）
-        if self.battle_active:
-            self.menu.draw_buttons()
 
     def update_message(self, screen):
         self.render_scene(screen)
@@ -217,7 +214,6 @@ class BattleScreen(pg.sprite.Sprite):
         if self.battle_active:
             return self.menu.handle_mouse_event(event)
         return False
-        # return self.menu.handle_mouse_event(event)
     
     def draw_buttons(self):
         self.menu.draw_buttons()
