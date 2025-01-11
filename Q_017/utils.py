@@ -52,4 +52,7 @@ class TextSprite(pg.sprite.Sprite):
         self.text = message
         self.image = self.font.render(self.text, True, self.color)
         self.surface = self.image
-        # self.rect = self.surface.get_frect()
+
+    def draw(self, screen):
+        self.screen = screen
+        self.screen.blit(self.surface, self.rect.topleft)

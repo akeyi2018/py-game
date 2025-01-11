@@ -113,6 +113,14 @@ class BattleScreen(pg.sprite.Sprite):
         # Battle state
         self.battle_active = True  # 戦闘がアクティブかどうかを管理するフラグ
 
+    def reset(self):
+        # バトル関連の状態をリセット
+        self.battle_message = []
+        self.battle_active = True
+        self.current_command = None
+        self.enemy = None
+
+
     def get_actions(self):
         return {
             "main": [
@@ -140,13 +148,27 @@ class BattleScreen(pg.sprite.Sprite):
         if self.enemy.mob_info['HP'] <= 0:
             mes_02 = f'{self.enemy.name}を倒しました。'
             self.general_message([mes_02])
-            self.battle_active = False  # 戦闘終了フラグを設定
+            self.battle_active = False  # 戦闘終了フラグを設定        
+        # 反撃(一回でPlayerが倒される)
+        else:
+            p_damege = 10
+            self.status.view_status['HP'] -= p_damege
+            mes = f'{self.enemy.name}の攻撃、' + \
+            f'{self.status.view_status['name']}は{p_damege}のダメージを受けました。'
+            self.general_message([mes])
+            if self.status.view_status['HP'] <=0:
+                mes_02 = f'{self.status.view_status['name']}は倒れました。'
+                self.general_message([mes_02])
+                self.battle_active = False  # 戦闘終了フラグを設定
+
 
     def get_battle_result(self):
         if self.enemy.mob_info['HP'] <= 0:
-            return False
+            return 1
+        elif self.status.view_status['HP'] <=0:
+            return 0
         else:
-            return True
+            return 3
 
     def escape(self):
         self.battle_message.append('逃げる')
@@ -183,11 +205,12 @@ class BattleScreen(pg.sprite.Sprite):
 
         self.layout.draw_background_text_area()
 
+        # ここのテキストはうまく更新できている　
         self.draw_text(screen)
 
         self.layout.draw_menu_backgroud()
 
-        # player status
+        # player status(この部分が前回の描画したテキストが残っている)
         self.status.draw_status(screen)
 
     def update_message(self, screen):

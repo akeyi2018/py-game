@@ -4,8 +4,9 @@ from settings import *
 from map import Map
 from groups import AllSprites
 from battle import BattleScreen
+from game_over import GameOver
 
-class game:
+class Game:
     def __init__(self):
         pg.init()
 
@@ -23,7 +24,8 @@ class game:
 
         self.battle_sprites = AllSprites()
 
-        self.game_stage = 'main'
+        # self.game_stage = 'main'
+        self.game_stage = 'game_over'
 
         # バトル管理
         self.battle = None  # BattleScreenクラスのインスタンスを保持
@@ -32,6 +34,9 @@ class game:
 
         # バトル初期化
         self.battle = BattleScreen(self.battle_sprites)
+
+        # 
+        self.game_over_flag = False
 
         # Map
         self.player, self.current_map = Map(self.all_sprites).create()
@@ -50,6 +55,10 @@ class game:
             elif self.game_stage == 'battle':
                 # 敵と衝突した後の画面
                 self.show_battle_screen()
+
+            elif self.game_stage == 'game_over':
+                self.show_game_over()
+
             pg.display.flip()
 
         pg.quit()
@@ -80,22 +89,55 @@ class game:
         if self.battle.battle_active:
             self.battle.draw_buttons()
 
+        self.battle.status.draw_status(self.display_surface)
+            
+
+    def show_game_over(self):
+        self.display_surface.fill((0, 0, 0))  # RGBで黒 (0, 0, 0)
+        self.game = GameOver()
+        self.game.text.draw(self.display_surface)
+        self.game.text2.draw(self.display_surface)
+
+    # メインステージ、敵の数、Playerの数上手くリセットできていない
+    def reset_game_state(self):
+        # 全てのスプライトを再生成
+        self.all_sprites = AllSprites()
+        self.battle_sprites = AllSprites()
+
+        # プレイヤーとマップを再生成
+        self.player, self.current_map = Map(self.all_sprites).create()
+
+        # バトルの状態を完全にリセット
+        self.battle = BattleScreen(self.battle_sprites)
+        self.init_battle = True
+        self.battle.reset()
+
+        # ゲームステージを"main"に戻す
+        self.game_stage = 'main'
+
 
     def events(self):
-        # イベント処理
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.running = False
 
-            elif event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
-                if self.battle.get_battle_result() == False:
-                    self.init_battle = True
-                    self.battle.battle_active = True
-                    self.player.game_stage = "main"  # 状態を"main"に戻す
-            else:
-                # BattleScreenクラスのマウスイベントを処理
-                self.update_message_flag = self.battle.handle_mouse_event(event)
+            if event.type == pg.KEYDOWN:
+                # バトル終了後、メイン画面に戻る処理
+                if event.key == pg.K_SPACE and self.game_stage == 'battle':
+                    if self.battle.get_battle_result() == 0:
+                        self.player.game_stage = 'game_over'
+                    elif self.battle.get_battle_result() == 1:
+                        self.init_battle = True
+                        self.battle.battle_active = True
+                        self.player.game_stage = "main"  # "main"に戻す
+                    
+                # Game Overからメイン画面に戻る処理
+                if event.key == pg.K_SPACE and self.game_stage == 'game_over':
+                    self.reset_game_state()
+
+            # BattleScreenのマウスイベントを処理
+            self.update_message_flag = self.battle.handle_mouse_event(event)
 
 if __name__ == "__main__":
-    new_game = game()
+    new_game = Game()
     new_game.run()
