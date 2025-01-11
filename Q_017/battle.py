@@ -1,6 +1,6 @@
 import pygame as pg
 from settings import *
-from utils import Button, TextSprite
+from utils import Button, TextSprite, TextAnimation
 from status import PlayerStatus
 
 class BattleMenu:
@@ -85,7 +85,7 @@ class BattleLayout:
         pg.draw.rect(self.display_surface, (255, 255, 255), self.text_area_rect, 3, border_radius=5)
 
 class BattleScreen(pg.sprite.Sprite):
-    def __init__(self, battle_sprites):
+    def __init__(self, battle_sprites, animation_sprites):
         super().__init__()
         self.display_surface = pg.display.get_surface()
 
@@ -95,6 +95,7 @@ class BattleScreen(pg.sprite.Sprite):
         self.enemy = None
 
         self.battle_sprites = battle_sprites
+        self.animation_sprites = animation_sprites
 
         # Layout
         self.layout = BattleLayout()
@@ -108,10 +109,18 @@ class BattleScreen(pg.sprite.Sprite):
         self.status = PlayerStatus((BG_SIZE_WIDTH, HEIGHT), self.battle_sprites)
         
         # messege
-        self.text_sprites = TextSprite('', self.font, (255,255,255),  (0,0,255), 250, 430, self.battle_sprites)
+        # self.text_sprites = TextSprite('', self.font, (255,255,255),  (0,0,255), 250, 430, self.battle_sprites)
+        self.text_sprites = TextAnimation(self.font, 
+                                          (255,255,255),  (0,0,255), 
+                                          250, 430, self.animation_sprites)
 
         # Battle state
         self.battle_active = True  # 戦闘がアクティブかどうかを管理するフラグ
+        
+        self.message_index = 0  # 現在表示している文字のインデックス
+        self.last_update_time = pg.time.get_ticks()  # 最後に文字を更新した時間
+        self.message_speed = 50  # メッセージの表示速度（ミリ秒単位）
+
 
     def reset(self):
         # バトル関連の状態をリセット
@@ -179,6 +188,7 @@ class BattleScreen(pg.sprite.Sprite):
 
     def mera(self):
         self.battle_message.append('メラ')
+
         self.menu.show_main_commands()
 
     def hyado(self):
@@ -202,21 +212,24 @@ class BattleScreen(pg.sprite.Sprite):
 
         if self.battle_active:
             self.display_surface.blit(self.enemy.battle_surface, self.mob_pos)
+        elif self.status.view_status['HP'] <=0:
+            self.display_surface.blit(self.enemy.battle_surface, self.mob_pos)
 
         self.layout.draw_background_text_area()
 
-        # ここのテキストはうまく更新できている　
+        # バトルメッセージ
         self.draw_text(screen)
 
         self.layout.draw_menu_backgroud()
 
-        # player status(この部分が前回の描画したテキストが残っている)
+        # player status
         self.status.draw_status(screen)
 
     def update_message(self, screen):
         self.render_scene(screen)
 
     def general_message(self, message_list):
+        
         for m in message_list:
             self.battle_message.append(m)
             if len(self.battle_message) > MAX_MESSAGE:
@@ -228,9 +241,16 @@ class BattleScreen(pg.sprite.Sprite):
 
         view_message = ['  ' + item for item in self.battle_message]
         return '\n'.join(view_message)
+    
+    # def set_message(self):
+    #     if len(self.battle_message) > MAX_MESSAGE:
+    #         del self.battle_message[0]
+
+    #     return self.battle_message
+    
 
     def draw_text(self, screen):
-        self.text_sprites.update_message(screen, self.set_message())
+        self.text_sprites.display_text_animation(screen, self.set_message())
 
     def handle_mouse_event(self, event):
         # 戦闘中のみボタンの押下処理を有効化

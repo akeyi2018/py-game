@@ -56,3 +56,44 @@ class TextSprite(pg.sprite.Sprite):
     def draw(self, screen):
         self.screen = screen
         self.screen.blit(self.surface, self.rect.topleft)
+
+
+class TextAnimation(pg.sprite.Sprite):
+    def __init__(self, font, fore_color, bg_color, x, y, all_sprites):
+        super().__init__()
+        self.font = font
+        self.color = fore_color
+        self.bg_color = bg_color
+        self.current_text = ''  # 現在表示されている文字列（1文字ずつ表示）
+        self.full_text = ''  # 完全なテキスト（最初は全て表示されない）
+        self.image = self.font.render(self.current_text, True, self.color)
+        self.surface = self.image
+        self.rect = self.image.get_rect(topleft=(x, y))
+        self.all_sprites = all_sprites
+        self.all_sprites.add(self)
+        self.animation_timer = 0  # アニメーションの経過時間
+
+    def update(self, delta_time):
+        """ 1文字ずつアニメーションで表示する """
+        self.animation_timer += delta_time
+        if self.animation_timer >= 5:  # 30msごとに1文字追加
+            if len(self.current_text) < len(self.full_text):
+                self.current_text += self.full_text[len(self.current_text)]  # 1文字追加
+                self.image = self.font.render(self.current_text, True, self.color)
+                self.surface = self.image
+            self.animation_timer = 0  # タイマーをリセット
+
+    def display_text_animation(self, screen, message):
+        """ メッセージを引数として受け取り、1文字ずつ表示するアニメーション """
+        print(message)
+        self.full_text = message  # 引数で受け取ったメッセージを設定
+        self.current_text = ''  # 現在の表示テキストをリセット
+        self.image = self.font.render(self.current_text, True, self.color)  # 変更後のテキストを空文字で初期化
+        self.surface = self.image
+        self.animation_timer = 0  # アニメーションをリセット
+        
+        # screen.fill((0, 0, 0))  # 背景を毎フレーム白に塗りつぶし
+        screen.blit(self.surface, self.rect.topleft)
+        pg.display.update()
+
+

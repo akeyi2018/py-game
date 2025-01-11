@@ -24,6 +24,8 @@ class Game:
 
         self.battle_sprites = AllSprites()
 
+        self.animation_sprites = pg.sprite.Group()
+
         # self.game_stage = 'main'
         self.game_stage = 'game_over'
 
@@ -33,7 +35,7 @@ class Game:
         self.update_message_flag = False
 
         # バトル初期化
-        self.battle = BattleScreen(self.battle_sprites)
+        self.battle = BattleScreen(self.battle_sprites, self.animation_sprites)
 
         # 
         self.game_over_flag = False
@@ -54,7 +56,7 @@ class Game:
 
             elif self.game_stage == 'battle':
                 # 敵と衝突した後の画面
-                self.show_battle_screen()
+                self.show_battle_screen(dt)
 
             elif self.game_stage == 'game_over':
                 self.show_game_over()
@@ -68,7 +70,7 @@ class Game:
         self.display_surface.fill(BLUE)
         self.all_sprites.draw()
 
-    def show_battle_screen(self):
+    def show_battle_screen(self, dt):
 
         # バトル画面の初期化
         if self.init_battle:
@@ -81,16 +83,22 @@ class Game:
         
         # 戦闘時メッセージの更新
         if self.update_message_flag:
+            
             self.battle.update_message(self.display_surface)
             self.battle_sprites.draw_battle()
             self.update_message_flag = False
+            self.battle.battle_message = []
 
         # 戦闘コマンドの描画(マウスホーバーを検知するため、ループの外側で実装)
         if self.battle.battle_active:
             self.battle.draw_buttons()
 
         self.battle.status.draw_status(self.display_surface)
-            
+        # self.battle_sprites.draw_battle()
+        # print(dt)
+        self.animation_sprites.update(dt)
+        self.animation_sprites.draw(self.display_surface)
+        
 
     def show_game_over(self):
         self.display_surface.fill((0, 0, 0))  # RGBで黒 (0, 0, 0)
@@ -108,7 +116,7 @@ class Game:
         self.player, self.current_map = Map(self.all_sprites).create()
 
         # バトルの状態を完全にリセット
-        self.battle = BattleScreen(self.battle_sprites)
+        self.battle = BattleScreen(self.battle_sprites, self.animation_sprites)
         self.init_battle = True
         self.battle.reset()
 
