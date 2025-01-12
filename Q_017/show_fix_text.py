@@ -37,7 +37,7 @@ class TextAnimation(pg.sprite.Sprite):
 
         if self.is_updating:  # アニメーション中であれば、テキストを更新
             self.animation_timer += delta_time
-            if self.animation_timer >= 30:  # 30msごとに1文字追加
+            if self.animation_timer >= 100:  # 30msごとに1文字追加
                 if len(self.current_text) < len(self.full_text):
                     self.current_text += self.full_text[len(self.current_text)]  # 次の1文字を追加
                 else:
@@ -49,26 +49,20 @@ class TextAnimation(pg.sprite.Sprite):
     def draw(self, fixed_texts):
         """現在の状態を描画"""
         # self.fixed_texts = fixed_texts
-        v = fixed_texts[:-1]
-        # すでに表示された固定テキストを描画
-        for i, text in enumerate(v):
-            text_surface = self.font.render(text, True, self.color)
-            self.screen.blit(text_surface, (self.x, self.y + i * 40)) 
+        # v = fixed_texts[:-1]
+        # # すでに表示された固定テキストを描画
+        # for i, text in enumerate(v):
+        #     text_surface = self.font.render(text, True, self.color)
+        #     self.screen.blit(text_surface, (self.x, self.y + i * 40)) 
         # アニメーション中のテキストを描画（アニメーション中だけ）
         if not self.animation_complete:
             # print('NNNNN')
             text_surface = self.font.render(self.current_text, True, self.color)
-            if len(fixed_texts) > 0:
-                pos = len(fixed_texts) -1
-            else:
-                pos = 0
-            self.screen.blit(text_surface, (self.x, self.y + pos * 40))
-
-    # def draw_fix(self, fixed_texts):
-    #     # print(f"test string {fix_list}")
-    #     for i, text in enumerate(fixed_texts):
-    #         text_surface = self.font.render(text, True, self.color)
-    #         self.screen.blit(text_surface, (self.x, (self.y + i +1) * 40))
+            # if len(fixed_texts) > 0:
+            #     pos = len(fixed_texts) -1
+            # else:
+            #     pos = 0
+            self.screen.blit(text_surface, (self.x, self.y + 40))
 
     def finalize_animation(self):
         """アニメーション終了後、テキストを固定リストに追加"""
@@ -120,10 +114,15 @@ while True:
             if count == 0:
                 new_string = init_list[0]
             else:
-                new_string = f"test string 0{count}"
+                new_string = f"test string 0{count} test 009"
+            count += 1
+
+            # view_string = new_string.split('\n')
+
+            # for s in view_string:
             # print(f"New string to animate: {new_string}")  # ログの表示
             text_animation.start_animation(new_string)  # 新しい文字列でアニメーション開始
-            count += 1
+              
             fix_list.append(new_string)
             if len(fix_list) > 5:
                 del fix_list[0]

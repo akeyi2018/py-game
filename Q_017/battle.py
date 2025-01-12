@@ -112,14 +112,13 @@ class BattleScreen(pg.sprite.Sprite):
         # self.text_sprites = TextSprite('', self.font, (255,255,255),  (0,0,255), 250, 430, self.battle_sprites)
         self.text_sprites = TextAnimation(self.font, 
                                           (255,255,255),  (0,0,255), 
-                                          250, 430, self.animation_sprites)
+                                          250, 430, self.display_surface)
 
         # Battle state
         self.battle_active = True  # 戦闘がアクティブかどうかを管理するフラグ
         
-        self.message_index = 0  # 現在表示している文字のインデックス
-        self.last_update_time = pg.time.get_ticks()  # 最後に文字を更新した時間
-        self.message_speed = 50  # メッセージの表示速度（ミリ秒単位）
+        self.fix_message = []
+        self.new_battle_message = ""
 
 
     def reset(self):
@@ -152,24 +151,23 @@ class BattleScreen(pg.sprite.Sprite):
         mes = f'{self.status.view_status['name']}は攻撃しました。' + \
             f'{self.enemy.name}は{damege}のダメージを受けました。'
         
-        self.general_message([mes])
+        # self.general_message([mes])
         
         if self.enemy.mob_info['HP'] <= 0:
             mes_02 = f'{self.enemy.name}を倒しました。'
-            self.general_message([mes_02])
+            self.general_message([mes, mes_02])
             self.battle_active = False  # 戦闘終了フラグを設定        
         # 反撃(一回でPlayerが倒される)
         else:
             p_damege = 10
             self.status.view_status['HP'] -= p_damege
-            mes = f'{self.enemy.name}の攻撃、' + \
+            mes_02 = f'{self.enemy.name}の攻撃、' + \
             f'{self.status.view_status['name']}は{p_damege}のダメージを受けました。'
-            self.general_message([mes])
+            self.general_message([mes, mes_02])
             if self.status.view_status['HP'] <=0:
                 mes_02 = f'{self.status.view_status['name']}は倒れました。'
-                self.general_message([mes_02])
+                self.general_message([mes, mes_02])
                 self.battle_active = False  # 戦闘終了フラグを設定
-
 
     def get_battle_result(self):
         if self.enemy.mob_info['HP'] <= 0:
@@ -203,8 +201,8 @@ class BattleScreen(pg.sprite.Sprite):
         self.enemy = player.collided_enemy
         self.mob_pos =  ((WIDTH - 128) /2,HEIGHT /8)
         self.mob_surface = self.enemy.battle_surface.copy()
-        # メッセージ
-        self.battle_message.append(f'{self.enemy.name}が現れました!') 
+
+        self.new_battle_message = f'{self.enemy.name}が現れました!'
         self.render_scene(screen)
 
     def render_scene(self, screen):
@@ -218,7 +216,7 @@ class BattleScreen(pg.sprite.Sprite):
         self.layout.draw_background_text_area()
 
         # バトルメッセージ
-        self.draw_text(screen)
+        self.text_sprites.start_animation(self.new_battle_message)
 
         self.layout.draw_menu_backgroud()
 
@@ -229,29 +227,8 @@ class BattleScreen(pg.sprite.Sprite):
         self.render_scene(screen)
 
     def general_message(self, message_list):
-        
-        for m in message_list:
-            self.battle_message.append(m)
-            if len(self.battle_message) > MAX_MESSAGE:
-                del self.battle_message[0]
-
-    def set_message(self):
-        if len(self.battle_message) > MAX_MESSAGE:
-            del self.battle_message[0]
-
-        view_message = ['  ' + item for item in self.battle_message]
-        return '\n'.join(view_message)
-    
-    # def set_message(self):
-    #     if len(self.battle_message) > MAX_MESSAGE:
-    #         del self.battle_message[0]
-
-    #     return self.battle_message
-    
-
-    def draw_text(self, screen):
-        # self.text_sprites.display_text_animation(screen, self.set_message())
-        self.text_sprites.start_animation(self.set_message())
+        view_message = ['  ' + item for item in message_list]
+        self.new_battle_message = '\n'.join(view_message)
 
     def handle_mouse_event(self, event):
         # 戦闘中のみボタンの押下処理を有効化
