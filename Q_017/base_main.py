@@ -96,8 +96,11 @@ class Game:
         self.battle.status.draw_status(self.display_surface)
         # self.battle_sprites.draw_battle()
         # print(dt)
-        self.animation_sprites.update(dt)
-        self.animation_sprites.draw(self.display_surface)
+        self.battle.text_sprites.update(dt)
+        if self.battle.text_sprites.animation_complete:
+            self.battle.text_sprites.finalize_animation()
+
+        self.battle.text_sprites.draw(self.display_surface, self.battle.battle_message)
         
 
     def show_game_over(self):
@@ -110,7 +113,7 @@ class Game:
     def reset_game_state(self):
         # 全てのスプライトを再生成
         self.all_sprites = AllSprites()
-        self.battle_sprites = AllSprites()
+        # self.battle_sprites = AllSprites()
 
         # プレイヤーとマップを再生成
         self.player, self.current_map = Map(self.all_sprites).create()

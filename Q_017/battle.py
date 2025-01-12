@@ -250,7 +250,8 @@ class BattleScreen(pg.sprite.Sprite):
     
 
     def draw_text(self, screen):
-        self.text_sprites.display_text_animation(screen, self.set_message())
+        # self.text_sprites.display_text_animation(screen, self.set_message())
+        self.text_sprites.start_animation(self.set_message())
 
     def handle_mouse_event(self, event):
         # 戦闘中のみボタンの押下処理を有効化
