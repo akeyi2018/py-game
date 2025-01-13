@@ -24,8 +24,17 @@ class PlayerStatus(pg.sprite.Sprite):
             'DEF': 25
         }
 
-        self.font = pg.font.Font("../battle/Meiryo.ttf", 22)
+        self.font = pg.font.Font(FONT, 20)
         self.battle_sprites = battle_sprites
+
+    def draw_bar(self):
+        self.bar_rect = pg.FRect(self.offset.x + self.bg_size[0] + 110,
+                                 self.offset.y + 95, 100,15)
+        pg.draw.rect(self.screen, (RED), self.bar_rect)
+        ratio = self.bar_rect.width / HP
+        val = self.view_status['HP']
+        progress_rect = pg.FRect(self.bar_rect.topleft, (val * ratio, self.bar_rect.height))
+        pg.draw.rect(self.screen, (GREEN), progress_rect)
 
     def draw_status(self, screen):
         # 枠
@@ -35,7 +44,7 @@ class PlayerStatus(pg.sprite.Sprite):
             self.offset.x -2,
             HEIGHT -2)
         self.surface = pg.Surface(self.p_area.size, pg.SRCALPHA)
-        self.surface.fill((142,118,152,100))
+        self.surface.fill((10, 15, 5, 190))
         self.screen = screen
         self.screen.blit(self.surface,
                         [
@@ -54,7 +63,7 @@ class PlayerStatus(pg.sprite.Sprite):
                 k + ' : ' + str(v), 
                 self.font, 
                 (255,255,255),(0,0,0), 
-                self.offset.x + self.bg_size[0] + span,
+                self.offset.x + self.bg_size[0] + span - 20,
                 y, self.battle_sprites)
             text_sprite.draw(screen)
 
@@ -68,3 +77,5 @@ class PlayerStatus(pg.sprite.Sprite):
                     ], 
                     3, 
                     border_radius=5)
+        
+        self.draw_bar()

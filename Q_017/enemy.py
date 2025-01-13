@@ -13,7 +13,7 @@ class Enemy(pg.sprite.Sprite):
         # name
         self.name = self.mob_info['name']
         self.original = pg.image.load(self.mob_img_path).convert_alpha()
-        self.battle_surface = pg.transform.scale(self.original, (128, 128))
+        self.battle_surface = pg.transform.scale(self.original, (150, 150))
         self.surface = pg.transform.scale(self.original, (64, 64))
         # 画面での位置
         self.pos = pos

@@ -55,6 +55,7 @@ class BattleLayout:
         self.display_surface = pg.display.get_surface()
         self.back_ground_img = pg.image.load('../battle/bg.png')
         self.back_ground_img = pg.transform.scale(self.back_ground_img, (819, HEIGHT))
+        # self.back_ground_img = pg.transform.scale(self.back_ground_img, (1280, HEIGHT))
 
         self.bg_size = self.back_ground_img.get_size()
         self.rect = self.back_ground_img.get_rect()
@@ -77,7 +78,7 @@ class BattleLayout:
 
         # 半透明の背景色を設定
         semi_transparent_surface = pg.Surface(self.text_area_rect.size, pg.SRCALPHA)
-        semi_transparent_surface.fill((0, 0, 255, 50))  # 半透明の青色
+        semi_transparent_surface.fill((10, 15, 5, 190))  # 半透明の青色
         
         # 角の描画ですこし小さくする
         self.display_surface.blit(semi_transparent_surface, 
@@ -93,10 +94,7 @@ class BattleScreen(pg.sprite.Sprite):
     def __init__(self, battle_sprites, animation_sprites):
         super().__init__()
         self.display_surface = pg.display.get_surface()
-
-        # self.font = pg.font.Font("../battle/Meiryo.ttf", MESSAGE_FONT_SIZE)
-        self.font = pg.font.Font("appmin.otf", MESSAGE_FONT_SIZE)
-        # self.battle_message = []
+        self.font = pg.font.Font(FONT, MESSAGE_FONT_SIZE)
 
         self.enemy = None
 
@@ -117,10 +115,9 @@ class BattleScreen(pg.sprite.Sprite):
         self.status = PlayerStatus((BG_SIZE_WIDTH, HEIGHT), self.battle_sprites)
         
         # messege
-        # self.text_sprites = TextSprite('', self.font, (255,255,255),  (0,0,255), 250, 430, self.battle_sprites)
         self.text_sprites = TextAnimation(self.font, 
                                           (255,255,255),  (0,0,255), 
-                                          250, 430, 
+                                          250, 435, 
                                           self.speed, 
                                           self.display_surface)
 
@@ -151,11 +148,6 @@ class BattleScreen(pg.sprite.Sprite):
                 ("ヒャド", self.hyado),
             ],
         }
-
-    # def check_battle_message(self, message):
-    #     self.battle_message.append(message)
-    #     if len(self.battle_message) > MAX_MESSAGE:
-    #         del self.battle_message[0]
 
     def attack(self):
         # 攻撃力は HP* 0.8
