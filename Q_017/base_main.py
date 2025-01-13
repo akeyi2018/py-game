@@ -70,12 +70,31 @@ class Game:
         self.display_surface.fill(BLUE)
         self.all_sprites.draw()
 
+    def cal_text_speed(self):
+        if len(self.battle.battle_message) > MAX_MESSAGE:
+            del self.battle.battle_message[0]
+        if len(self.battle.battle_message) > 0:
+            if self.battle.counter <= self.battle.speed * len(self.battle.battle_message[-1]):
+                self.battle.counter += 1
+
+    def replace_message(self, message):
+
+        temp_message = []
+        for m in message:
+            sp = m.split('\n')
+            for s in sp:
+                temp_message.append(s)
+                if len(temp_message) > MAX_MESSAGE:
+                    del temp_message[0]
+
+        return temp_message
+
     def show_battle_screen(self, dt):
 
         # バトル画面の初期化
         if self.init_battle:
-            self.battle.battle_message = ""
-            self.battle.fix_message = []
+            self.battle.battle_message = []
+            self.battle.counter = 0
             self.init_battle = False  
 
             # バトル画面描画
@@ -84,11 +103,12 @@ class Game:
         
         # 戦闘時メッセージの更新
         if self.update_message_flag:
-            
             self.battle.update_message(self.display_surface)
             self.battle_sprites.draw_battle()
+            self.battle.battle_message = self.replace_message(self.battle.battle_message)
             self.update_message_flag = False
-            self.battle.battle_message = []
+            self.battle.counter = 0
+            
 
         # 戦闘コマンドの描画(マウスホーバーを検知するため、ループの外側で実装)
         if self.battle.battle_active:
@@ -97,10 +117,12 @@ class Game:
         self.battle.status.draw_status(self.display_surface)
         
         self.battle.text_sprites.update(dt)
-        if self.battle.text_sprites.animation_complete:
-            self.battle.text_sprites.finalize_animation()
-        # 戦闘メッセージの描画
-        self.battle.text_sprites.draw()
+
+        self.cal_text_speed()
+        
+        if len(self.battle.battle_message) > 0:
+            # 戦闘メッセージの描画
+            self.battle.text_sprites.draw(self.battle.battle_message, self.battle.counter)
         
 
     def show_game_over(self):

@@ -1,6 +1,6 @@
 import pygame as pg
 from settings import *
-from utils import Button, TextSprite, TextAnimation
+from utils import Button, TextAnimation, Backmusic, TextSprite
 from status import PlayerStatus
 
 class BattleMenu:
@@ -43,7 +43,12 @@ class BattleMenu:
             for button in self.buttons[self.currend_command]:
                 if button.check_click(mouse_pos):  # ボタンがクリックされたか判定
                     button.action()  # ボタンに設定された関数を呼び出し
-                    return True
+
+                    print(f'button text:{button.text}')
+                    if button.text == 'Magic':
+                        return False
+                    else:
+                        return True
 
 class BattleLayout:
     def __init__(self):
@@ -89,7 +94,8 @@ class BattleScreen(pg.sprite.Sprite):
         super().__init__()
         self.display_surface = pg.display.get_surface()
 
-        self.font = pg.font.Font("../battle/Meiryo.ttf", MESSAGE_FONT_SIZE)
+        # self.font = pg.font.Font("../battle/Meiryo.ttf", MESSAGE_FONT_SIZE)
+        self.font = pg.font.Font("appmin.otf", MESSAGE_FONT_SIZE)
         # self.battle_message = []
 
         self.enemy = None
@@ -101,6 +107,8 @@ class BattleScreen(pg.sprite.Sprite):
         self.layout = BattleLayout()
 
         self.current_command = 0
+        self.speed = 20
+        self.counter = 0
 
         # menu
         self.menu = BattleMenu(self.get_actions())
@@ -112,13 +120,14 @@ class BattleScreen(pg.sprite.Sprite):
         # self.text_sprites = TextSprite('', self.font, (255,255,255),  (0,0,255), 250, 430, self.battle_sprites)
         self.text_sprites = TextAnimation(self.font, 
                                           (255,255,255),  (0,0,255), 
-                                          250, 430, self.display_surface)
+                                          250, 430, 
+                                          self.speed, 
+                                          self.display_surface)
 
         # Battle state
         self.battle_active = True  # 戦闘がアクティブかどうかを管理するフラグ
         
-        self.fix_message = []
-        self.new_battle_message = ""
+        self.battle_message = []
 
 
     def reset(self):
@@ -132,8 +141,8 @@ class BattleScreen(pg.sprite.Sprite):
     def get_actions(self):
         return {
             "main": [
-                ("攻撃", self.attack),
-                ("魔法", self.show_sub_commands),
+                ("Attack", self.attack),
+                ("Magic", self.show_sub_commands),
                 ("逃げる", self.escape),
             ],
             "sub": [
@@ -143,30 +152,37 @@ class BattleScreen(pg.sprite.Sprite):
             ],
         }
 
+    # def check_battle_message(self, message):
+    #     self.battle_message.append(message)
+    #     if len(self.battle_message) > MAX_MESSAGE:
+    #         del self.battle_message[0]
+
     def attack(self):
         # 攻撃力は HP* 0.8
-        damege = int(self.status.infact_status['ATK'] / 2) - int(self.enemy.mob_info['DEF']/4)
+        damege = int(self.status.infact_status['ATK'] / 4) - int(self.enemy.mob_info['DEF']/3)
         self.enemy.mob_info['HP'] -= damege
         
         mes = f'{self.status.view_status['name']}は攻撃しました。' + \
             f'{self.enemy.name}は{damege}のダメージを受けました。'
-        
-        # self.general_message([mes])
-        
+        self.general_message([mes])
         if self.enemy.mob_info['HP'] <= 0:
+            self.music = Backmusic('../music/battle/win_001.wav')
+            self.music.play_one()
             mes_02 = f'{self.enemy.name}を倒しました。'
-            self.general_message([mes, mes_02])
+            self.general_message([mes_02])
             self.battle_active = False  # 戦闘終了フラグを設定        
         # 反撃(一回でPlayerが倒される)
         else:
-            p_damege = 10
+            p_damege = int(self.enemy.mob_info['STR']) - int(self.status.infact_status['DEF']/4)
             self.status.view_status['HP'] -= p_damege
             mes_02 = f'{self.enemy.name}の攻撃、' + \
             f'{self.status.view_status['name']}は{p_damege}のダメージを受けました。'
-            self.general_message([mes, mes_02])
+            self.general_message([mes_02])
             if self.status.view_status['HP'] <=0:
-                mes_02 = f'{self.status.view_status['name']}は倒れました。'
-                self.general_message([mes, mes_02])
+                self.music = Backmusic('../music/battle/game_over_001.wav')
+                self.music.play_one()
+                mes_03 = f'{self.status.view_status['name']}は倒れました。'
+                self.general_message([mes, mes_02, mes_03])
                 self.battle_active = False  # 戦闘終了フラグを設定
 
     def get_battle_result(self):
@@ -202,7 +218,8 @@ class BattleScreen(pg.sprite.Sprite):
         self.mob_pos =  ((WIDTH - 128) /2,HEIGHT /8)
         self.mob_surface = self.enemy.battle_surface.copy()
 
-        self.new_battle_message = f'{self.enemy.name}が現れました!'
+        self.battle_message.append(f'  {self.enemy.name}が現れました!')
+        # print(self.battle_message)
         self.render_scene(screen)
 
     def render_scene(self, screen):
@@ -215,9 +232,6 @@ class BattleScreen(pg.sprite.Sprite):
 
         self.layout.draw_background_text_area()
 
-        # バトルメッセージ
-        self.text_sprites.start_animation(self.new_battle_message)
-
         self.layout.draw_menu_backgroud()
 
         # player status
@@ -227,8 +241,13 @@ class BattleScreen(pg.sprite.Sprite):
         self.render_scene(screen)
 
     def general_message(self, message_list):
+
         view_message = ['  ' + item for item in message_list]
-        self.new_battle_message = '\n'.join(view_message)
+        view_message = '\n'.join(view_message)
+        
+        self.battle_message.append(view_message)
+        if len(self.battle_message) > MAX_MESSAGE:
+            del self.battle_message[0]
 
     def handle_mouse_event(self, event):
         # 戦闘中のみボタンの押下処理を有効化

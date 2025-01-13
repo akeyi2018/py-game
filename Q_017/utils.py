@@ -4,6 +4,22 @@ from settings import *
 class Util:
     pass
 
+
+class Backmusic:
+    def __init__(self, file):
+        self.music = pg.mixer.music.load(file)
+
+    def play(self):
+        pg.mixer.music.set_volume(0.5)
+        pg.mixer.music.play(-1)
+
+    def play_one(self):
+        pg.mixer.music.set_volume(0.5)
+        pg.mixer.music.play()
+
+    def stop(self):
+        pg.mixer.music.stop()
+
 # ボタンのクラス
 class Button:
     def __init__(self, x, y, width, height, text, action):
@@ -12,7 +28,7 @@ class Button:
         self.action = action
         self.color = (0, 0, 200)
         self.hover_color = (200, 0, 0)
-        self.font = pg.font.Font("../battle/Meiryo.ttf", 24)
+        self.font = pg.font.Font("appmin.otf", 24)
         self.text_surface = self.font.render(self.text, True, (255, 255, 255))
         self.text_rect = self.text_surface.get_rect(center=self.rect.center)
         self.current_color = self.color  # 現在の色
@@ -58,79 +74,26 @@ class TextSprite(pg.sprite.Sprite):
         self.screen.blit(self.surface, self.rect.topleft)
 
 class TextAnimation(pg.sprite.Sprite):
-    def __init__(self, font, fore_color, bg_color, x, y, screen):
+    def __init__(self, font, fore_color, bg_color, x, y, speed, screen):
         super().__init__()
         self.font = font
         self.color = fore_color
         self.bg_color = bg_color
         self.x = x
         self.y = y
+        self.speed = speed
         self.screen = screen
         
-        # アニメーション用の変数
-        self.current_text = ''  # 現在表示されている文字列
-        self.full_text = ''  # アニメーションで表示するテキスト
-        self.animation_timer = 0  # アニメーション用のタイマー
-        self.fixed_texts = []  # 表示済みの固定テキスト
-        self.animation_complete = False  # アニメーション完了フラグ
-        self.is_updating = False  # アニメーションが進行中かどうかを示すフラグ
-        self.ready_to_finalize = False  # finalize_animationを呼び出す準備ができたかのフラグ
-        self.pending_addition = None  # 次に追加する文字列
-
-    def start_animation(self, string):
-        """アニメーションを開始"""
-        # print(f"Starting animation with text: {string}")  # デバッグ用メッセージ
-        self.current_text = ''  # アニメーションの現在テキストを初期化
-        self.full_text = string  # アニメーション対象のフルテキスト
-        self.animation_complete = False  # アニメーション完了フラグをリセット
-        self.is_updating = True  # アニメーションが進行中とする
-        self.ready_to_finalize = False  # finalize_animationの準備ができていない
-
-    def update(self, delta_time):
-        """アニメーション処理"""
-        if self.animation_complete and not self.ready_to_finalize:
-            return  # アニメーション完了時、finalizeが準備できていなければ処理しない
-
-        if self.is_updating:  # アニメーション中であれば、テキストを更新
-            self.animation_timer += delta_time
-            if self.animation_timer >= 2:  # 30msごとに1文字追加
-                if len(self.current_text) < len(self.full_text):
-                    self.current_text += self.full_text[len(self.current_text)]  # 次の1文字を追加
-                else:
-                    self.animation_complete = True  # アニメーションが完了
-                    self.is_updating = False  # アニメーション更新を停止
-                    self.ready_to_finalize = True  # finalize_animationを呼べる状態に
-                self.animation_timer = 0  # タイマーをリセット
-
-    def draw(self):
+    def draw(self, fixed_texts, counter):
         """現在の状態を描画"""
-        # アニメーション中のテキストを描画（アニメーション中だけ）
-        if not self.animation_complete:
-            text_surface = self.font.render(self.current_text, True, self.color)
-            self.screen.blit(text_surface, (self.x, self.y))
-
-    def finalize_animation(self):
-        """アニメーション終了後、テキストを固定リストに追加"""
-        if self.ready_to_finalize:  # finalize準備ができていれば実行
-            self.animation_complete = False  # 次のアニメーション用にリセット
-            self.ready_to_finalize = False  # finalize準備をリセット
-        return None
-
-    def start_animation(self, string):
-        """アニメーションを開始"""
-        self.current_text = ''  # アニメーションの現在テキストを初期化
-        self.full_text = string  # アニメーション対象のフルテキスト
-        # print(self.full_text)
-        self.animation_complete = False  # アニメーション完了フラグをリセット
-        self.is_updating = True  # アニメーションが進行中とする
-        self.ready_to_finalize = False  # finalize_animationの準備ができていない
-
-    def finalize_animation(self):
-        """アニメーション終了後、テキストを固定リストに追加"""
-        if self.ready_to_finalize:  # finalize準備ができていれば実行
-            self.animation_complete = False  # 次のアニメーション用にリセット
-            self.ready_to_finalize = False  # finalize準備をリセット
-            # return self.full_text  # 完了した文字列を返す
-        return None
-
+        self.fixed_texts = fixed_texts
+        last_line = len(self.fixed_texts)
+        # すでに表示された固定テキストを描画
+        for i, text in enumerate(self.fixed_texts):
+            if i == last_line -1:
+                text_surface = self.font.render(text[0:counter//self.speed], True, self.color)
+                self.screen.blit(text_surface, (self.x, self.y + i * 32))
+            else:
+                text_surface = self.font.render(text, True, self.color)
+                self.screen.blit(text_surface, (self.x, self.y + i * 32))
 
