@@ -36,6 +36,8 @@ class PlayerStatus(pg.sprite.Sprite):
         progress_rect = pg.FRect(self.bar_rect.topleft, (val * ratio, self.bar_rect.height))
         pg.draw.rect(self.screen, (GREEN), progress_rect)
 
+        pg.draw.rect(self.screen, (WHITE), self.bar_rect, 2, border_radius=2)
+
     def draw_status(self, screen):
         # 枠
         self.p_area = pg.Rect(
@@ -44,7 +46,7 @@ class PlayerStatus(pg.sprite.Sprite):
             self.offset.x -2,
             HEIGHT -2)
         self.surface = pg.Surface(self.p_area.size, pg.SRCALPHA)
-        self.surface.fill((10, 15, 5, 190))
+        self.surface.fill((52, 50, 30, 190))
         self.screen = screen
         self.screen.blit(self.surface,
                         [
