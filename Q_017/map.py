@@ -7,8 +7,10 @@ from player import Player
 import random
 
 class Map(pg.sprite.Sprite):
-    def __init__(self, all_sprites, *groups):
+    def __init__(self, parent, all_sprites, *groups):
         super().__init__(*groups)
+
+        self.parent = parent
 
         self.block_images = {
             "B" : "../maps/tree.png"
@@ -38,7 +40,7 @@ class Map(pg.sprite.Sprite):
                     self.block = Block((x,y), self.block_images['B'], self.collision_sprites, self.all_sprites)
 
                 if column == 'P':
-                    self.player = Player((x,y), self.collision_sprites, self.enemy_sprites, self.all_sprites)
+                    self.player = Player(self.parent, (x,y), self.collision_sprites, self.enemy_sprites, self.all_sprites)
 
         return self.player, self.current_map
     

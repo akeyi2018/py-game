@@ -6,9 +6,10 @@ from enemy_maneger import EntryEnemy
 
 class Player(pg.sprite.Sprite):
     
-    def __init__(self, pos, collision_sprites, enemy_sprites, all_sprites, *groups):
+    def __init__(self, parent, pos, collision_sprites, enemy_sprites, all_sprites, *groups):
         super().__init__(*groups)
 
+        self.parent = parent
         self.collision_sprites = collision_sprites
         self.enemy_sprites = enemy_sprites
         self.all_sprites = all_sprites
@@ -51,7 +52,7 @@ class Player(pg.sprite.Sprite):
         for enemy_sprite in self.enemy_sprites:
             if enemy_sprite.rect.colliderect(self.hit_box_rect):
                 print(f'{enemy_sprite.name}と衝突しました！')
-                self.game_stage = 'battle'
+                self.parent.game_stage = 'battle'
                 self.collided_enemy = enemy_sprite
                 collided_enemies.append((enemy_sprite)) #あとで集計ログで使うので残す
         

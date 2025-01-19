@@ -11,7 +11,7 @@ class Backmusic:
 
     def play(self):
         pg.mixer.music.set_volume(0.5)
-        pg.mixer.music.play(-1)
+        pg.mixer.music.play(-1, fade_ms=1500)
 
     def play_one(self):
         pg.mixer.music.set_volume(0.5)
@@ -19,6 +19,24 @@ class Backmusic:
 
     def stop(self):
         pg.mixer.music.stop()
+
+    
+
+class Sound:
+    def __init__(self, file):
+        self.music = pg.mixer.Sound(file)
+
+    def play(self):
+        self.music.set_volume(0.8)
+        self.music.play()
+
+    # def play_one(self):
+    #     pg.mixer.music.set_volume(0.5)
+    #     pg.mixer.music.play()
+
+    def stop(self):
+        pg.mixer.music.stop()
+
 
 # ボタンのクラス
 class Button:
@@ -97,3 +115,9 @@ class TextAnimation(pg.sprite.Sprite):
                 text_surface = self.font.render(text, True, self.color)
                 self.screen.blit(text_surface, (self.x, self.y + i * 32))
 
+    def draw_anime(self, fixed_texts, counter):
+        """現在の状態を描画"""
+        self.fixed_texts = fixed_texts
+        text_surface = self.font.render(self.fixed_texts[0:counter//self.speed], True, self.color)
+        self.screen.blit(text_surface, (self.x, self.y))
+            

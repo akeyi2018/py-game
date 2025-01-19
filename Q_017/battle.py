@@ -1,6 +1,6 @@
 import pygame as pg
 from settings import *
-from utils import Button, TextAnimation, Backmusic, TextSprite
+from utils import Button, TextAnimation, Sound
 from status import PlayerStatus
 
 class BattleMenu:
@@ -91,15 +91,16 @@ class BattleLayout:
         pg.draw.rect(self.display_surface, (255, 255, 255), self.text_area_rect, 3, border_radius=5)
 
 class BattleScreen(pg.sprite.Sprite):
-    def __init__(self, battle_sprites, animation_sprites):
+    def __init__(self, parent, battle_sprites):
         super().__init__()
         self.display_surface = pg.display.get_surface()
         self.font = pg.font.Font(FONT, MESSAGE_FONT_SIZE)
 
         self.enemy = None
 
+        self.parent = parent
+
         self.battle_sprites = battle_sprites
-        self.animation_sprites = animation_sprites
 
         # Layout
         self.layout = BattleLayout()
@@ -152,38 +153,42 @@ class BattleScreen(pg.sprite.Sprite):
     def attack(self):
         # 攻撃力は HP* 0.8
         damege = int(self.status.infact_status['ATK'] / 4) - int(self.enemy.mob_info['DEF']/3)
+        # damege = int(self.status.infact_status['ATK']*2 ) - int(self.enemy.mob_info['DEF']/3)
         self.enemy.mob_info['HP'] -= damege
         
         mes = f'{self.status.view_status['name']}は攻撃しました。' + \
             f'{self.enemy.name}は{damege}のダメージを受けました。'
         self.general_message([mes])
         if self.enemy.mob_info['HP'] <= 0:
-            self.music = Backmusic('../music/battle/win_001.wav')
-            self.music.play_one()
+            self.music = Sound('../music/battle/win_001.wav')
+            self.music.play()
             mes_02 = f'{self.enemy.name}を倒しました。'
             self.general_message([mes_02])
             self.battle_active = False  # 戦闘終了フラグを設定        
         # 反撃(一回でPlayerが倒される)
         else:
-            p_damege = int(self.enemy.mob_info['STR']) - int(self.status.infact_status['DEF']/4)
+            # p_damege = int(self.enemy.mob_info['STR']) - int(self.status.infact_status['DEF']/4)
+            p_damege = 200
+
             self.status.view_status['HP'] -= p_damege
+            if self.status.view_status['HP'] <= 0 : self.status.view_status['HP'] = 0
             mes_02 = f'{self.enemy.name}の攻撃、' + \
             f'{self.status.view_status['name']}は{p_damege}のダメージを受けました。'
             self.general_message([mes_02])
-            if self.status.view_status['HP'] <=0:
-                self.music = Backmusic('../music/battle/game_over_001.wav')
-                self.music.play_one()
+            if self.status.view_status['HP'] == 0:
+                self.music = Sound('../music/battle/game_over_001.wav')
+                self.music.play()
                 mes_03 = f'{self.status.view_status['name']}は倒れました。'
                 self.general_message([mes, mes_02, mes_03])
                 self.battle_active = False  # 戦闘終了フラグを設定
 
     def get_battle_result(self):
         if self.enemy.mob_info['HP'] <= 0:
-            return 1
-        elif self.status.view_status['HP'] <=0:
-            return 0
-        else:
-            return 3
+            self.parent.init_battle = True
+            self.battle_active = True
+            self.parent.game_stage = 'main'
+        elif self.status.view_status['HP'] == 0:
+            self.parent.game_stage = 'game_over'
 
     def escape(self):
         self.battle_message.append('逃げる')

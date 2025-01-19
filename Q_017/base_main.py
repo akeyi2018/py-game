@@ -4,10 +4,14 @@ from settings import *
 from map import Map
 from groups import AllSprites
 from battle import BattleScreen
-from game_over import GameOver
+from game_over import GameOver, StartMenu
+from utils import Backmusic
+import os
+
 
 class Game:
     def __init__(self):
+        pg.mixer.init()
         pg.init()
 
         # screen
@@ -24,46 +28,85 @@ class Game:
 
         self.battle_sprites = AllSprites()
 
-        self.animation_sprites = pg.sprite.Group()
+        self.game_stage = 'start_menu'
+        self.current_stage = self.game_stage
 
-        # self.game_stage = 'main'
-        self.game_stage = 'game_over'
+        self.start = StartMenu(self)
 
+        
         # バトル管理
-        self.battle = None  # BattleScreenクラスのインスタンスを保持
         self.init_battle = True  # バトル画面初期化フラグ
         self.update_message_flag = False
 
         # バトル初期化
-        self.battle = BattleScreen(self.battle_sprites, self.animation_sprites)
-
-        # 
-        self.game_over_flag = False
+        self.battle = BattleScreen(self, self.battle_sprites)
 
         # Map
-        self.player, self.current_map = Map(self.all_sprites).create()
+        self.player, self.current_map = Map(self, self.all_sprites).create()
+
+        self.bgm_dict ={
+            "start_menu": '../music/kaisou/winter_flut.mp3',
+            "main": '../music/town/Sky-Airship.mp3',
+            "battle": '../music/battle/Battle-Rosemoon.mp3',
+            "game_over": '../music/kaisou/reminiscence.mp3',
+        }
+
+    def show_game_menu(self, stage, dt):
+        menus = {
+            "main": self.main_screen,
+            "battle": self.show_battle_screen,
+            "game_over": self.show_game_over,
+            "start_menu": self.start_menu
+        }
+        return menus[stage](dt)
+    
+    def play_background_music(self, stage):
+        """ 音楽を再生する """
+        bgm_path = self.bgm_dict.get(stage)
+
+        if bgm_path and os.path.exists(bgm_path):  # ファイルの存在チェック
+            self.bgm = Backmusic(bgm_path)
+            self.bgm.play()
+            print(bgm_path)
+        else:
+            print(f"音楽ファイルが見つかりません: {bgm_path}")
+
         
     def run(self):
         """ゲームループ"""
-        dt = self.clock.tick(FPS) / 1000
+        dt = self.clock.tick(FPS) /1000
 
         while self.running:
+
             # events
             self.events()
-            self.game_stage = self.player.game_stage
-            if self.game_stage == 'main':
-                self.main_screen(dt)
+   
+            self.show_game_menu(self.game_stage, dt)
 
-            elif self.game_stage == 'battle':
-                # 敵と衝突した後の画面
-                self.show_battle_screen(dt)
+            if self.current_stage != self.game_stage:
+                self.play_background_music(self.game_stage)
+                self.current_stage = self.game_stage
 
-            elif self.game_stage == 'game_over':
-                self.show_game_over()
+            if not pg.mixer.music.get_busy():
+                self.play_background_music(self.game_stage)
 
             pg.display.flip()
-
+        
         pg.quit()
+
+    def start_menu(self, dt):
+        self.display_surface.fill((BLUE))
+        
+        if self.start.counter >= len(self.start.story_description) * self.start.speed:
+            pass
+        else:
+            self.start.counter += 1
+        # print(self.start.counter)
+        # スタート画面
+        # self.start = StartMenu(self)
+        self.start.draw()
+        self.start.descriptions.draw_anime(self.start.story_description, self.start.counter)
+        
 
     def main_screen(self, dt):
         self.all_sprites.update(dt, self.current_map)
@@ -78,7 +121,6 @@ class Game:
                 self.battle.counter += 1
 
     def replace_message(self, message):
-
         temp_message = []
         for m in message:
             sp = m.split('\n')
@@ -106,9 +148,9 @@ class Game:
             self.battle.update_message(self.display_surface)
             self.battle_sprites.draw_battle()
             self.battle.battle_message = self.replace_message(self.battle.battle_message)
+            # self.battle.get_battle_result()
             self.update_message_flag = False
             self.battle.counter = 0
-            
 
         # 戦闘コマンドの描画(マウスホーバーを検知するため、ループの外側で実装)
         if self.battle.battle_active:
@@ -125,11 +167,10 @@ class Game:
             self.battle.text_sprites.draw(self.battle.battle_message, self.battle.counter)
         
 
-    def show_game_over(self):
+    def show_game_over(self, dt):
         self.display_surface.fill((0, 0, 0))  # RGBで黒 (0, 0, 0)
-        self.game = GameOver()
-        self.game.text.draw(self.display_surface)
-        self.game.text2.draw(self.display_surface)
+        self.game = GameOver(self)
+        self.game.draw()
 
     # メインステージ、敵の数、Playerの数上手くリセットできていない
     def reset_game_state(self):
@@ -137,16 +178,15 @@ class Game:
         self.all_sprites = AllSprites()
 
         # プレイヤーとマップを再生成
-        self.player, self.current_map = Map(self.all_sprites).create()
+        self.player, self.current_map = Map(self, self.all_sprites).create()
 
         # バトルの状態を完全にリセット
-        self.battle = BattleScreen(self.battle_sprites, self.animation_sprites)
+        self.battle = BattleScreen(self, self.battle_sprites)
         self.init_battle = True
         self.battle.reset()
 
         # ゲームステージを"main"に戻す
         self.game_stage = 'main'
-
 
     def events(self):
         for event in pg.event.get():
@@ -156,19 +196,12 @@ class Game:
             if event.type == pg.KEYDOWN:
                 # バトル終了後、メイン画面に戻る処理
                 if event.key == pg.K_SPACE and self.game_stage == 'battle':
-                    if self.battle.get_battle_result() == 0:
-                        self.player.game_stage = 'game_over'
-                    elif self.battle.get_battle_result() == 1:
-                        self.init_battle = True
-                        self.battle.battle_active = True
-                        self.player.game_stage = "main"  # "main"に戻す
-                    
-                # Game Overからメイン画面に戻る処理
-                if event.key == pg.K_SPACE and self.game_stage == 'game_over':
-                    self.reset_game_state()
+                    self.battle.get_battle_result()
 
             # BattleScreenのマウスイベントを処理
             self.update_message_flag = self.battle.handle_mouse_event(event)
+
+            self.start.handle_mouse_event(event)
 
 if __name__ == "__main__":
     new_game = Game()
