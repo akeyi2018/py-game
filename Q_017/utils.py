@@ -101,23 +101,66 @@ class TextAnimation(pg.sprite.Sprite):
         self.y = y
         self.speed = speed
         self.screen = screen
-        
+
+        self.can_view = True
+        self.view_char_timer = 0
+        self.cool_down_duaration = 50
+
+    def view_char(self):
+        if not self.can_view:
+            current_time = pg.time.get_ticks()
+            if current_time - self.view_char_timer >= self.cool_down_duaration:
+                self.can_view = True
+
     def draw(self, fixed_texts, counter):
         """現在の状態を描画"""
         self.fixed_texts = fixed_texts
         last_line = len(self.fixed_texts)
-        # すでに表示された固定テキストを描画
+        self.last_battle_msg = self.fixed_texts[last_line - 1][0:counter]
+        rect = pg.Rect(self.x +2, self.y +2, 819*0.95 -4, HEIGHT*0.3 -10)
+        self.screen.fill((0,50,100), (self.x +2, self.y -2, 819*0.95 -4, HEIGHT*0.3 -5))
+        # すでに表示された  固定テキストを描画
         for i, text in enumerate(self.fixed_texts):
             if i == last_line -1:
-                text_surface = self.font.render(text[0:counter//self.speed], True, self.color)
-                self.screen.blit(text_surface, (self.x, self.y + i * 32))
+                text_surface = self.font.render(self.last_battle_msg, True, self.color)
             else:
                 text_surface = self.font.render(text, True, self.color)
-                self.screen.blit(text_surface, (self.x, self.y + i * 32))
+            self.screen.blit(text_surface, (self.x, self.y + i * 32))
+
+        if self.can_view:
+            self.view_char_timer = pg.time.get_ticks()
+            self.can_view = False
+        else:
+            self.view_char()
+        
+        return self.can_view, counter
+
 
     def draw_anime(self, fixed_texts, counter):
         """現在の状態を描画"""
-        self.fixed_texts = fixed_texts
-        text_surface = self.font.render(self.fixed_texts[0:counter//self.speed], True, self.color)
+        self.fixed_texts = fixed_texts[0:counter]
+        text_surface = self.font.render(self.fixed_texts, True, self.color)
         self.screen.blit(text_surface, (self.x, self.y))
-            
+
+        if self.can_view:
+            self.view_char_timer = pg.time.get_ticks()
+            self.can_view = False
+            # print(counter)
+        else:
+            self.view_char()
+
+        return self.can_view, counter
+    
+
+    # def draw(self, fixed_texts, counter):
+    #     """現在の状態を描画"""
+    #     self.fixed_texts = fixed_texts
+    #     last_line = len(self.fixed_texts)
+    #     # すでに表示された固定テキストを描画
+    #     for i, text in enumerate(self.fixed_texts):
+    #         if i == last_line -1:
+    #             text_surface = self.font.render(text[0:counter//self.speed], True, self.color)
+    #             self.screen.blit(text_surface, (self.x, self.y + i * 32))
+    #         else:
+    #             text_surface = self.font.render(text, True, self.color)
+    #             self.screen.blit(text_surface, (self.x, self.y + i * 32))

@@ -1,7 +1,8 @@
 import pygame as pg
 from settings import *
-from utils import Button, TextAnimation, Sound
+from utils import Button, TextAnimation, Sound, TextSprite
 from status import PlayerStatus
+import queue
 
 class BattleMenu:
     def __init__(self, actions):
@@ -55,7 +56,6 @@ class BattleLayout:
         self.display_surface = pg.display.get_surface()
         self.back_ground_img = pg.image.load('../battle/bg.png')
         self.back_ground_img = pg.transform.scale(self.back_ground_img, (819, HEIGHT))
-        # self.back_ground_img = pg.transform.scale(self.back_ground_img, (1280, HEIGHT))
 
         self.bg_size = self.back_ground_img.get_size()
         self.rect = self.back_ground_img.get_rect()
@@ -72,20 +72,23 @@ class BattleLayout:
         pg.draw.rect(self.display_surface, '#8E7698', [2, 2, self.off_set.x -2, HEIGHT-2])
         pg.draw.rect(self.display_surface,'#D3DED0', [0, 0, self.off_set.x, HEIGHT],5,border_radius=5)
 
-    def draw_background_text_area(self):
+    def draw_background_text_area(self, screen):
         """必要最小限の透明マスクを新規作成し、配置する"""
         self.text_area_rect = pg.Rect(250, 430, self.bg_size[0] * 0.95, self.bg_size[1] * 0.3)
 
-        # 半透明の背景色を設定
-        semi_transparent_surface = pg.Surface(self.text_area_rect.size, pg.SRCALPHA)
-        semi_transparent_surface.fill((10, 15, 5, 190))  # 半透明の青色
+        # screen.fill((0,0,0), self.text_area_rect)
+
+        # # 半透明の背景色を設定
+        # semi_transparent_surface = pg.Surface(self.text_area_rect.size, pg.SRCALPHA)
+        # semi_transparent_surface.fill((10, 15, 5, 190))  # 半透明の青色
         
-        # 角の描画ですこし小さくする
-        self.display_surface.blit(semi_transparent_surface, 
-                                  [self.text_area_rect.x + 2,
-                                   self.text_area_rect.y + 2,
-                                   self.text_area_rect.width -2,
-                                   self.text_area_rect.height -2])
+        # # 角の描画ですこし小さくする
+        # self.display_surface.blit(semi_transparent_surface, 
+        #                           [self.text_area_rect.x + 2,
+        #                            self.text_area_rect.y + 2,
+        #                            self.text_area_rect.width -2,
+        #                            self.text_area_rect.height -2])
+
 
         # 枠線を再描画
         pg.draw.rect(self.display_surface, (255, 255, 255), self.text_area_rect, 3, border_radius=5)
@@ -106,7 +109,7 @@ class BattleScreen(pg.sprite.Sprite):
         self.layout = BattleLayout()
 
         self.current_command = 0
-        self.speed = 20
+        self.speed = 200
         self.counter = 0
 
         # menu
@@ -127,6 +130,11 @@ class BattleScreen(pg.sprite.Sprite):
         
         self.battle_message = []
 
+        self.message_next_flag = True
+        self.msg_que = queue.Queue()
+
+        self.que_cool_timer = 0
+        self.que_cool_down = 50
 
     def reset(self):
         # バトル関連の状態をリセット
@@ -167,8 +175,8 @@ class BattleScreen(pg.sprite.Sprite):
             self.battle_active = False  # 戦闘終了フラグを設定        
         # 反撃(一回でPlayerが倒される)
         else:
-            # p_damege = int(self.enemy.mob_info['STR']) - int(self.status.infact_status['DEF']/4)
-            p_damege = 200
+            p_damege = int(self.enemy.mob_info['STR']) - int(self.status.infact_status['DEF']/4)
+            # p_damege = 200
 
             self.status.view_status['HP'] -= p_damege
             if self.status.view_status['HP'] <= 0 : self.status.view_status['HP'] = 0
@@ -179,7 +187,7 @@ class BattleScreen(pg.sprite.Sprite):
                 self.music = Sound('../music/battle/game_over_001.wav')
                 self.music.play()
                 mes_03 = f'{self.status.view_status['name']}は倒れました。'
-                self.general_message([mes, mes_02, mes_03])
+                self.general_message([mes_03])
                 self.battle_active = False  # 戦闘終了フラグを設定
 
     def get_battle_result(self):
@@ -190,8 +198,15 @@ class BattleScreen(pg.sprite.Sprite):
         elif self.status.view_status['HP'] == 0:
             self.parent.game_stage = 'game_over'
 
+    def get_que_cool_time(self):
+        if not self.message_next_flag:
+            current_time = pg.time.get_ticks()
+            if current_time - self.que_cool_timer >= self.que_cool_down:
+                self.message_next_flag = True
+
     def escape(self):
-        self.battle_message.append('逃げる')
+        # self.battle_message.append('逃げる')
+        self.msg_que.put(f'  逃げる')
 
     def hoimi(self):
         self.battle_message.append('ホイミ')
@@ -214,9 +229,9 @@ class BattleScreen(pg.sprite.Sprite):
         self.enemy = player.collided_enemy
         self.mob_pos =  ((WIDTH - 128) /2,HEIGHT /8)
         self.mob_surface = self.enemy.battle_surface.copy()
-
-        self.battle_message.append(f'  {self.enemy.name}が現れました!')
-        # print(self.battle_message)
+        
+        self.msg_que.put(f'  {self.enemy.name}が現れました!')
+        
         self.render_scene(screen)
 
     def render_scene(self, screen):
@@ -227,7 +242,7 @@ class BattleScreen(pg.sprite.Sprite):
         elif self.status.view_status['HP'] <=0:
             self.display_surface.blit(self.enemy.battle_surface, self.mob_pos)
 
-        self.layout.draw_background_text_area()
+        self.layout.draw_background_text_area(screen)
 
         self.layout.draw_menu_backgroud()
 
@@ -241,10 +256,9 @@ class BattleScreen(pg.sprite.Sprite):
 
         view_message = ['  ' + item for item in message_list]
         view_message = '\n'.join(view_message)
-        
-        self.battle_message.append(view_message)
-        if len(self.battle_message) > MAX_MESSAGE:
-            del self.battle_message[0]
+
+        # キューに入れる
+        self.msg_que.put(view_message)
 
     def handle_mouse_event(self, event):
         # 戦闘中のみボタンの押下処理を有効化

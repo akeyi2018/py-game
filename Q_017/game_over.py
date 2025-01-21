@@ -28,7 +28,7 @@ class GameOver:
     def input(self):
         keys = pg.key.get_pressed()
         if keys[pg.K_RETURN]: 
-            # self.parent.reset_game_state()
+            self.parent.start.counter = 0
             self.parent.game_stage = 'start_menu'
 
 
@@ -45,7 +45,7 @@ class StartMenu:
                                (0,0,255), 
                                WIDTH / 2 - 200, 50, self.start_sprites)
         
-        self.speed = 50
+        self.speed = 100
         
         
         self.img = pg.image.load('../img/winter-forest1.jpg')

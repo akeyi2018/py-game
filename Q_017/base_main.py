@@ -28,12 +28,11 @@ class Game:
 
         self.battle_sprites = AllSprites()
 
-        self.game_stage = 'start_menu'
+        self.game_stage = STAGE
         self.current_stage = self.game_stage
 
-        self.start = StartMenu(self)
+        self.start = None
 
-        
         # バトル管理
         self.init_battle = True  # バトル画面初期化フラグ
         self.update_message_flag = False
@@ -43,13 +42,6 @@ class Game:
 
         # Map
         self.player, self.current_map = Map(self, self.all_sprites).create()
-
-        self.bgm_dict ={
-            "start_menu": '../music/kaisou/winter_flut.mp3',
-            "main": '../music/town/Sky-Airship.mp3',
-            "battle": '../music/battle/Battle-Rosemoon.mp3',
-            "game_over": '../music/kaisou/reminiscence.mp3',
-        }
 
     def show_game_menu(self, stage, dt):
         menus = {
@@ -62,7 +54,7 @@ class Game:
     
     def play_background_music(self, stage):
         """ 音楽を再生する """
-        bgm_path = self.bgm_dict.get(stage)
+        bgm_path = BGM.get(stage)
 
         if bgm_path and os.path.exists(bgm_path):  # ファイルの存在チェック
             self.bgm = Backmusic(bgm_path)
@@ -71,7 +63,6 @@ class Game:
         else:
             print(f"音楽ファイルが見つかりません: {bgm_path}")
 
-        
     def run(self):
         """ゲームループ"""
         dt = self.clock.tick(FPS) /1000
@@ -95,41 +86,22 @@ class Game:
         pg.quit()
 
     def start_menu(self, dt):
+        # print(f'dt:{dt*1000}')
         self.display_surface.fill((BLUE))
-        
-        if self.start.counter >= len(self.start.story_description) * self.start.speed:
-            pass
-        else:
-            self.start.counter += 1
-        # print(self.start.counter)
-        # スタート画面
-        # self.start = StartMenu(self)
+        if self.start == None:
+            self.start = StartMenu(self)
+
         self.start.draw()
-        self.start.descriptions.draw_anime(self.start.story_description, self.start.counter)
         
+        flag, self.start.counter = self.start.descriptions.draw_anime(self.start.story_description, self.start.counter)
+
+        if flag and self.start.counter <= len(self.start.story_description) :
+            self.start.counter += 1
 
     def main_screen(self, dt):
         self.all_sprites.update(dt, self.current_map)
         self.display_surface.fill(BLUE)
         self.all_sprites.draw()
-
-    def cal_text_speed(self):
-        if len(self.battle.battle_message) > MAX_MESSAGE:
-            del self.battle.battle_message[0]
-        if len(self.battle.battle_message) > 0:
-            if self.battle.counter <= self.battle.speed * len(self.battle.battle_message[-1]):
-                self.battle.counter += 1
-
-    def replace_message(self, message):
-        temp_message = []
-        for m in message:
-            sp = m.split('\n')
-            for s in sp:
-                temp_message.append(s)
-                if len(temp_message) > MAX_MESSAGE:
-                    del temp_message[0]
-
-        return temp_message
 
     def show_battle_screen(self, dt):
 
@@ -147,8 +119,6 @@ class Game:
         if self.update_message_flag:
             self.battle.update_message(self.display_surface)
             self.battle_sprites.draw_battle()
-            self.battle.battle_message = self.replace_message(self.battle.battle_message)
-            # self.battle.get_battle_result()
             self.update_message_flag = False
             self.battle.counter = 0
 
@@ -160,12 +130,25 @@ class Game:
         
         self.battle.text_sprites.update(dt)
 
-        self.cal_text_speed()
+        if self.battle.msg_que.qsize() > 0 and self.battle.message_next_flag:
+            
+            que = self.battle.msg_que.get()
+            self.battle.que_cool_timer = pg.time.get_ticks()
+            self.battle.battle_message.append(que)
+            if len(self.battle.battle_message) > MAX_MESSAGE:
+                del self.battle.battle_message[0]
+            
+            self.battle.message_next_flag = False
+
+        self.battle.get_que_cool_time()
         
         if len(self.battle.battle_message) > 0:
             # 戦闘メッセージの描画
-            self.battle.text_sprites.draw(self.battle.battle_message, self.battle.counter)
-        
+            flag, self.battle.counter = self.battle.text_sprites.draw(self.battle.battle_message, self.battle.counter)
+            if flag:
+                if self.battle.counter <= len(self.battle.battle_message[-1]):
+                    self.battle.counter += 1
+
 
     def show_game_over(self, dt):
         self.display_surface.fill((0, 0, 0))  # RGBで黒 (0, 0, 0)
@@ -201,7 +184,8 @@ class Game:
             # BattleScreenのマウスイベントを処理
             self.update_message_flag = self.battle.handle_mouse_event(event)
 
-            self.start.handle_mouse_event(event)
+            # メインメニューのマウスイベント処理
+            if not self.start == None: self.start.handle_mouse_event(event)
 
 if __name__ == "__main__":
     new_game = Game()

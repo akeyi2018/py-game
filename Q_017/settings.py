@@ -40,3 +40,12 @@ MESSAGE_FONT_SIZE = 20
 BG_SIZE_WIDTH = 819
 
 FONT = "appmin.otf"
+
+BGM = {
+    "start_menu": '../music/kaisou/winter_flut.mp3',
+    "main": '../music/town/Sky-Airship.mp3',
+    "battle": '../music/battle/Battle-Rosemoon.mp3',
+    "game_over": '../music/kaisou/reminiscence.mp3',
+}
+
+STAGE = 'start_menu'
