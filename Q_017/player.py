@@ -13,12 +13,13 @@ class Player(pg.sprite.Sprite):
         self.collision_sprites = collision_sprites
         self.enemy_sprites = enemy_sprites
         self.all_sprites = all_sprites
+        self.pos = pos
 
         # イメージの読み込み
         self.surface = pg.image.load(IMAGE_PATH).convert_alpha()
 
         # 矩形（rect）と位置情報
-        self.rect = self.surface.get_frect(topleft=pos)
+        self.rect = self.surface.get_frect(topleft=self.pos)
         self.hit_box_rect = self.rect.inflate(1,1)
 
         # 移動関連
@@ -29,7 +30,6 @@ class Player(pg.sprite.Sprite):
         self.collided_enemy = None
         
         self.all_sprites.add(self)
-
 
     def handle_input(self, dt):
         """キーボード入力で移動処理を行う"""

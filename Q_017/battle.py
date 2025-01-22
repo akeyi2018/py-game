@@ -205,7 +205,6 @@ class BattleScreen(pg.sprite.Sprite):
                 self.message_next_flag = True
 
     def escape(self):
-        # self.battle_message.append('逃げる')
         self.msg_que.put(f'  逃げる')
 
     def hoimi(self):

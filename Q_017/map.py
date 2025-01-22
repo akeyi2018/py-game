@@ -44,6 +44,32 @@ class Map(pg.sprite.Sprite):
 
         return self.player, self.current_map
     
+    def reset(self, save_info):
+        
+        # BlockとPlayerの配置
+        for i, row in enumerate(self.current_map):
+            for j, column in enumerate(row):
+                x = j * TILE_SIZE
+                y = i * TILE_SIZE
+
+                if column == 'B':
+                    self.block = Block((x,y), self.block_images['B'], self.collision_sprites, self.all_sprites)
+        print(type(save_info))
+        x = save_info["x"] * TILE_SIZE
+        y = save_info["y"] * TILE_SIZE
+        # playerの配置
+        self.player = Player(self.parent, (x,y), self.collision_sprites, self.enemy_sprites, self.all_sprites)
+
+        #  # 敵の配置
+        # self.reset_enemy()
+
+        return self.player, self.current_map
+    
+    def cal_player_in_tile(self, x, y):
+        tile_x = int(x / TILE_SIZE)
+        tile_y = int(y / TILE_SIZE)
+
+
     def create_enemy(self):
         #生成時作業用ID
         entry = EntryEnemy()
@@ -59,9 +85,6 @@ class Map(pg.sprite.Sprite):
                     # モブ生成
                     mob_info = entry.generate_random_enemy()
                     self.enemy = Enemy((x,y), mob_info, [j,i], self.enemy_sprites, self.all_sprites)
-
-                    # id += 1
-                    # if id >2: id = 0
 
     def cal_player_area(self, max_y, max_x):
         # px 

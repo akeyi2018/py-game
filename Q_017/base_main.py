@@ -6,6 +6,7 @@ from groups import AllSprites
 from battle import BattleScreen
 from game_over import GameOver, StartMenu
 from utils import Backmusic
+from save_load import GameData
 import os
 
 
@@ -39,9 +40,6 @@ class Game:
 
         # バトル初期化
         self.battle = BattleScreen(self, self.battle_sprites)
-
-        # Map
-        self.player, self.current_map = Map(self, self.all_sprites).create()
 
     def show_game_menu(self, stage, dt):
         menus = {
@@ -86,11 +84,10 @@ class Game:
         pg.quit()
 
     def start_menu(self, dt):
-        # print(f'dt:{dt*1000}')
         self.display_surface.fill((BLUE))
         if self.start == None:
             self.start = StartMenu(self)
-
+        
         self.start.draw()
         
         flag, self.start.counter = self.start.descriptions.draw_anime(self.start.story_description, self.start.counter)
@@ -156,7 +153,8 @@ class Game:
         self.game.draw()
 
     # メインステージ、敵の数、Playerの数上手くリセットできていない
-    def reset_game_state(self):
+    def init_game_state(self):
+
         # 全てのスプライトを再生成
         self.all_sprites = AllSprites()
 
@@ -171,9 +169,33 @@ class Game:
         # ゲームステージを"main"に戻す
         self.game_stage = 'main'
 
+    def reset_game_state(self, save_info):
+
+        # 全てのスプライトを再生成
+        self.all_sprites = AllSprites()
+
+        # プレイヤーとマップを再生成
+        self.player, self.current_map = Map(self, self.all_sprites).reset(save_info)
+
+        # バトルの状態を完全にリセット
+        self.battle = BattleScreen(self, self.battle_sprites)
+        self.init_battle = True
+        self.battle.reset()
+
+        # ゲームステージを"main"に戻す
+        self.game_stage = 'main'
+
     def events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT:
+                save_data = {
+                    "x": max(int(self.player.rect.centerx/TILE_SIZE),2),
+                    "y": max(int(self.player.rect.centery/TILE_SIZE),2)
+                }
+                # print(f'pos:{save_data}')
+                game_data = GameData(save_info=save_data)
+                game_data.Save()
+
                 self.running = False
 
             if event.type == pg.KEYDOWN:

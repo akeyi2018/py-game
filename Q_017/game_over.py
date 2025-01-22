@@ -2,6 +2,7 @@ import pygame as pg
 
 from settings import *
 from utils import TextSprite, Button, TextAnimation
+from save_load import GameData
 
 class GameOver:
     def __init__(self, parent):
@@ -37,8 +38,8 @@ class StartMenu:
         self.parent = parent
         self.screen = self.parent.display_surface
         self.start_sprites = pg.sprite.Group()
-        self.font_title = pg.font.Font("appmin.otf", 36)
-        self.font_description = pg.font.Font("appmin.otf", 24)
+        self.font_title = pg.font.Font(FONT, 36)
+        self.font_description = pg.font.Font(FONT, 24)
         self.forecolor = "#FFFFFF"
         self.text = TextSprite('北境の黎明', self.font_title, 
                                self.forecolor,  
@@ -46,6 +47,8 @@ class StartMenu:
                                WIDTH / 2 - 200, 50, self.start_sprites)
         
         self.speed = 100
+
+        self.stage = 'start'
         
         
         self.img = pg.image.load('../img/winter-forest1.jpg')
@@ -87,6 +90,7 @@ class StartMenu:
         ]
 
     def draw(self):
+
         self.screen.blit(self.back_ground_img, self.rect)
         self.text_area = pg.Rect(WIDTH*(0.15)-5, HEIGHT*0.05, WIDTH * 0.7, HEIGHT * 0.4)
         surf = pg.Surface(self.text_area.size, pg.SRCALPHA)
@@ -95,6 +99,7 @@ class StartMenu:
         self.text.draw(self.screen)
         for button in self.buttons:
             button.draw(self.screen)
+
 
     def handle_mouse_event(self, event):
         if event.type == pg.MOUSEBUTTONDOWN:
@@ -106,13 +111,26 @@ class StartMenu:
 
     def start(self):
         print('start')
-        self.parent.reset_game_state()
-        self.parent.game_stage = 'main'
+        self.parent.init_game_state()
 
     def load(self):
         print('load')
+        game_data = GameData()
+        save_info = game_data.Load_files()
+        
+        self.parent.reset_game_state(save_info)
 
     def option(self):
         print('option')
         
 
+class LoadMenu:
+    def __init__(self):
+        self.img = pg.image.load('../img/load_menu.png')
+        self.back_ground_img = pg.transform.scale(self.img, (WIDTH, HEIGHT))
+        self.rect = self.back_ground_img.get_rect()
+
+    def draw(self, screen):
+        screen.fill((0,0,0))
+        screen.blit(self.back_ground_img, self.rect)
+    
