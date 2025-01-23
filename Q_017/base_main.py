@@ -93,20 +93,17 @@ class Game:
             self.start = StartMenu(self)
         
         self.start.draw()
-        
-        flag, self.start.counter = self.start.descriptions.draw_anime(self.start.story_description, self.start.counter)
+        # self.start.draw_text_anime()
+        # flag, self.start.counter = self.start.descriptions.draw_anime(self.start.story_description, self.start.counter)
 
-        if flag and self.start.counter <= len(self.start.story_description) :
-            self.start.counter += 1
+        # if flag and self.start.counter <= len(self.start.story_description) :
+        #     self.start.counter += 1
 
     def community(self, dt):
         if self.com_npc == None:
             self.com_npc = Communication(self)
 
         self.com_npc.draw()
-        # print(self.com_npc.draw_flag)
-        # if self.com_npc.draw_flag:
-        #     self.game_stage = 'main'
 
     def main_screen(self, dt):
         self.all_sprites.update(dt, self.current_map)

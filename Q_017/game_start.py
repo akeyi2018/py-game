@@ -68,8 +68,18 @@ class StartMenu:
         surf.fill((10,15,5,128))
         self.screen.blit(surf, self.text_area)
         self.text.draw(self.screen)
+
+        self.draw_text_anime()
+
         for button in self.buttons:
             button.draw(self.screen)
+
+
+    def draw_text_anime(self):
+        flag, self.counter = self.descriptions.draw_anime(self.story_description, self.counter)
+
+        if flag and self.counter <= len(self.story_description) :
+            self.counter += 1
 
 
     def handle_mouse_event(self, event):
