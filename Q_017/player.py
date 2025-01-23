@@ -22,7 +22,7 @@ class Player(pg.sprite.Sprite):
 
         # 矩形（rect）と位置情報
         self.rect = self.surface.get_frect(topleft=self.pos)
-        self.hit_box_rect = self.rect.inflate(1,1)
+        self.hit_box_rect = self.rect.inflate(-10,-10)
 
         # 移動関連
         self.key_speed = 5

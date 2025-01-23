@@ -15,6 +15,7 @@ class Map(pg.sprite.Sprite):
         self.block_images = {
             "B" : "../maps/tree.png",
             "N" : "../maps/town/yh001.png",
+            "G" : "../maps/grass.png"
         }
         self.name = 'map_01'
         self.current_map = TILE[self.name]
@@ -30,8 +31,13 @@ class Map(pg.sprite.Sprite):
 
     def create(self):
         
-        # 敵の配置
-        self.create_enemy()
+        for i, row in enumerate(self.current_map):
+            for j, column in enumerate(row):
+                x = j * TILE_SIZE
+                y = i * TILE_SIZE
+
+                if column != '':
+                    self.block = Block((x,y), self.block_images['G'], self.all_sprites)
 
         # BlockとPlayerの配置
         for i, row in enumerate(self.current_map):
@@ -48,9 +54,20 @@ class Map(pg.sprite.Sprite):
                 if column == 'P':
                     self.player = Player(self.parent, (x,y), self.collision_sprites, self.enemy_sprites, self.npc_sprites, self.all_sprites)
 
+        # 敵の配置
+        self.create_enemy()
+
         return self.player, self.current_map
     
     def reset(self, save_info):
+
+        for i, row in enumerate(self.current_map):
+            for j, column in enumerate(row):
+                x = j * TILE_SIZE
+                y = i * TILE_SIZE
+
+                if column != '':
+                    self.block = Block((x,y), self.block_images['G'], self.all_sprites)
         
         # BlockとPlayerの配置
         for i, row in enumerate(self.current_map):

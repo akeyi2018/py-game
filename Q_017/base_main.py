@@ -93,11 +93,6 @@ class Game:
             self.start = StartMenu(self)
         
         self.start.draw()
-        # self.start.draw_text_anime()
-        # flag, self.start.counter = self.start.descriptions.draw_anime(self.start.story_description, self.start.counter)
-
-        # if flag and self.start.counter <= len(self.start.story_description) :
-        #     self.start.counter += 1
 
     def community(self, dt):
         if self.com_npc == None:
