@@ -7,7 +7,9 @@ class Block(pg.sprite.Sprite):
 
         try:
             # イメージの読み込み
-            self.surface = pg.image.load(img_path).convert_alpha()
+
+            self.image = pg.image.load(img_path).convert_alpha()
+            self.surface = pg.transform.scale(self.image, (TILE_SIZE, TILE_SIZE))
         except:
             pass
 

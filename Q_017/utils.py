@@ -99,12 +99,11 @@ class TextAnimation(pg.sprite.Sprite):
         self.bg_color = bg_color
         self.x = x
         self.y = y
-        self.speed = speed
         self.screen = screen
 
         self.can_view = True
         self.view_char_timer = 0
-        self.cool_down_duaration = 50
+        self.cool_down_duaration = speed
 
     def view_char(self):
         if not self.can_view:
@@ -150,17 +149,3 @@ class TextAnimation(pg.sprite.Sprite):
             self.view_char()
 
         return self.can_view, counter
-    
-
-    # def draw(self, fixed_texts, counter):
-    #     """現在の状態を描画"""
-    #     self.fixed_texts = fixed_texts
-    #     last_line = len(self.fixed_texts)
-    #     # すでに表示された固定テキストを描画
-    #     for i, text in enumerate(self.fixed_texts):
-    #         if i == last_line -1:
-    #             text_surface = self.font.render(text[0:counter//self.speed], True, self.color)
-    #             self.screen.blit(text_surface, (self.x, self.y + i * 32))
-    #         else:
-    #             text_surface = self.font.render(text, True, self.color)
-    #             self.screen.blit(text_surface, (self.x, self.y + i * 32))

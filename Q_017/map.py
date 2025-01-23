@@ -13,7 +13,8 @@ class Map(pg.sprite.Sprite):
         self.parent = parent
 
         self.block_images = {
-            "B" : "../maps/tree.png"
+            "B" : "../maps/tree.png",
+            "N" : "../maps/town/yh001.png",
         }
         self.name = 'map_01'
         self.current_map = TILE[self.name]
@@ -22,6 +23,8 @@ class Map(pg.sprite.Sprite):
         self.collision_sprites = pg.sprite.Group()
 
         self.enemy_sprites = pg.sprite.Group()
+
+        self.npc_sprites = pg.sprite.Group()
 
         self.all_sprites = all_sprites
 
@@ -39,8 +42,11 @@ class Map(pg.sprite.Sprite):
                 if column == 'B':
                     self.block = Block((x,y), self.block_images['B'], self.collision_sprites, self.all_sprites)
 
+                if column == 'N':
+                    self.block = Block((x,y), self.block_images['N'], self.npc_sprites, self.all_sprites)
+
                 if column == 'P':
-                    self.player = Player(self.parent, (x,y), self.collision_sprites, self.enemy_sprites, self.all_sprites)
+                    self.player = Player(self.parent, (x,y), self.collision_sprites, self.enemy_sprites, self.npc_sprites, self.all_sprites)
 
         return self.player, self.current_map
     
@@ -54,14 +60,14 @@ class Map(pg.sprite.Sprite):
 
                 if column == 'B':
                     self.block = Block((x,y), self.block_images['B'], self.collision_sprites, self.all_sprites)
+                if column == 'N':
+                    self.block = Block((x,y), self.block_images['N'], self.npc_sprites, self.all_sprites)
+
         print(type(save_info))
         x = save_info["x"] * TILE_SIZE
         y = save_info["y"] * TILE_SIZE
         # playerの配置
-        self.player = Player(self.parent, (x,y), self.collision_sprites, self.enemy_sprites, self.all_sprites)
-
-        #  # 敵の配置
-        # self.reset_enemy()
+        self.player = Player(self.parent, (x,y), self.collision_sprites, self.enemy_sprites, self.npc_sprites, self.all_sprites)
 
         return self.player, self.current_map
     

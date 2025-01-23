@@ -4,14 +4,16 @@ import random
 from enemy import Enemy
 from enemy_maneger import EntryEnemy
 
+
 class Player(pg.sprite.Sprite):
     
-    def __init__(self, parent, pos, collision_sprites, enemy_sprites, all_sprites, *groups):
+    def __init__(self, parent, pos, collision_sprites, enemy_sprites, npc_sprites, all_sprites, *groups):
         super().__init__(*groups)
 
         self.parent = parent
         self.collision_sprites = collision_sprites
         self.enemy_sprites = enemy_sprites
+        self.npc_sprites = npc_sprites
         self.all_sprites = all_sprites
         self.pos = pos
 
@@ -68,7 +70,6 @@ class Player(pg.sprite.Sprite):
         if len(self.mob_pos_info) < MAX_ENEMY_NUM:
             # Mob生成
             self.general_mob(base_map)
-            # self.enemy_sprites.append(new_enemy)
         
         # メイン矩形をヒットボックスに同期
         self.rect.center = self.hit_box_rect.center
@@ -176,6 +177,38 @@ class Player(pg.sprite.Sprite):
 
         return player_area
 
+
+    def collision_npc(self, dt):
+        """ブロックとの衝突判定と位置調整を行う"""
+        # 水平方向の衝突処理
+        self.hit_box_rect.x += self.direction.x * self.key_speed *dt
+        for block in self.npc_sprites:
+            if block.rect.colliderect(self.hit_box_rect):
+                # print('ここから先には行けません。')
+                self.parent.game_stage = 'community'
+                if self.direction.x > 0:  # 右に移動中
+                    self.hit_box_rect.right = block.rect.left
+                elif self.direction.x < 0:  # 左に移動中
+                    self.hit_box_rect.left = block.rect.right
+                # 衝突後、移動量をリセット
+                self.direction.x = 0
+
+
+        # 垂直方向の衝突処理
+        self.hit_box_rect.y += self.direction.y * self.key_speed *dt
+        for block in self.npc_sprites:
+            if block.rect.colliderect(self.hit_box_rect):
+                # print('ここから先には行けません。')
+                if self.direction.y > 0:  # 下に移動中
+                    self.hit_box_rect.bottom = block.rect.top
+                elif self.direction.y < 0:  # 上に移動中
+                    self.hit_box_rect.top = block.rect.bottom
+                # 衝突後、移動量をリセット
+                self.direction.y = 0
+
+        # メイン矩形をヒットボックスに同期
+        self.rect.center = self.hit_box_rect.center
+
     def collision_block(self,dt):
         """ブロックとの衝突判定と位置調整を行う"""
         # 水平方向の衝突処理
@@ -207,4 +240,28 @@ class Player(pg.sprite.Sprite):
         base_map = self.get_base_map(current_map)
         self.handle_input(dt)
         self.collision_block(dt)
+        self.collision_npc(dt)
         self.collision_enemy(dt, base_map)
+
+
+    def check_map_transition(self):
+        """
+        プレイヤーの位置を監視し、マップ遷移をチェックする
+        """
+        # print(f'X:{self.rect.x} Y:{self.rect.y}')
+        tile_x = int(self.rect.centerx / TILE_SIZE)
+        tile_y = int(self.rect.centery / TILE_SIZE)
+
+        # 左端
+        if self.rect.left < 0:
+            return "left"  # 左マップへ遷移
+        # 右端
+        elif tile_x > TILE * len(self.current_map[0]):
+            return "right"  # 右マップへ遷移
+        # 上端
+        elif self.rect.top < 0:
+            return "up"  # 上マップへ遷移
+        # 下端
+        elif self.rect.bottom > TILE * len(self.current_map):
+            return "down"  # 下マップへ遷移
+        return None  # 遷移なし

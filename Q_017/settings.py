@@ -25,12 +25,19 @@ TILE = {
     "map_01": [
         'BBBBBBBBBBBBBBBBBBB',
         'B.................B',
-        'B.P...............B',
+        'B...............P.N',
         'B.................B',
         'B.................B',
         'B.....BBBB........B',
         'B.................B',
         'B.................B',
+        'BBBBBBBBBBBBBBBBBBB',
+    ],
+    "map_02": [
+        'BBBBBBBBBBBBBBBBBBB',
+        'B.................B',
+        '..P...............B',
+        '.....BBBBBB.......B',
         'BBBBBBBBBBBBBBBBBBB',
     ],
     }

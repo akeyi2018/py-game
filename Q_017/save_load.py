@@ -20,13 +20,13 @@ class GameData:
                 break
         return file
     
-    def Save(self):
+    def save(self):
         save_file = self.get_new_file()
         with open(save_file,'wb') as f:
             pickle.dump(self.save_info,f)
             print('SUCCESSLY TO SAVE.')
 
-    def Load_files(self):
+    def load_files(self):
         file = 'game_data_100.pickle'
         save_file = os.path.join(self.route_path, file)
         with open(save_file, 'rb') as f:

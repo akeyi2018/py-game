@@ -109,7 +109,7 @@ class BattleScreen(pg.sprite.Sprite):
         self.layout = BattleLayout()
 
         self.current_command = 0
-        self.speed = 200
+        self.speed = 100
         self.counter = 0
 
         # menu
@@ -162,11 +162,15 @@ class BattleScreen(pg.sprite.Sprite):
         # 攻撃力は HP* 0.8
         damege = int(self.status.infact_status['ATK'] / 4) - int(self.enemy.mob_info['DEF']/3)
         # damege = int(self.status.infact_status['ATK']*2 ) - int(self.enemy.mob_info['DEF']/3)
-        self.enemy.mob_info['HP'] -= damege
+
+        # self.enemy.mob_info['HP'] -= damege
+        self.enemy.mob_info['HP'] -= 200
         
         mes = f'{self.status.view_status['name']}は攻撃しました。' + \
             f'{self.enemy.name}は{damege}のダメージを受けました。'
         self.general_message([mes])
+        self.music = Sound('../music/battle/tm2_swing000.wav')
+        self.music.play()
         if self.enemy.mob_info['HP'] <= 0:
             self.music = Sound('../music/battle/win_001.wav')
             self.music.play()

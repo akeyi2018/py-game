@@ -4,11 +4,12 @@ from settings import *
 from map import Map
 from groups import AllSprites
 from battle import BattleScreen
-from game_over import GameOver, StartMenu
+from game_over import GameOver
+from game_start import StartMenu
 from utils import Backmusic
 from save_load import GameData
 import os
-
+from communication import Communication
 
 class Game:
     def __init__(self):
@@ -33,6 +34,7 @@ class Game:
         self.current_stage = self.game_stage
 
         self.start = None
+        self.com_npc = None
 
         # バトル管理
         self.init_battle = True  # バトル画面初期化フラグ
@@ -46,7 +48,8 @@ class Game:
             "main": self.main_screen,
             "battle": self.show_battle_screen,
             "game_over": self.show_game_over,
-            "start_menu": self.start_menu
+            "start_menu": self.start_menu,
+            "community": self.community,
         }
         return menus[stage](dt)
     
@@ -57,9 +60,10 @@ class Game:
         if bgm_path and os.path.exists(bgm_path):  # ファイルの存在チェック
             self.bgm = Backmusic(bgm_path)
             self.bgm.play()
-            print(bgm_path)
+            # print(bgm_path)
         else:
-            print(f"音楽ファイルが見つかりません: {bgm_path}")
+            # print(f"音楽ファイルが見つかりません: {bgm_path}")
+            pass
 
     def run(self):
         """ゲームループ"""
@@ -94,6 +98,15 @@ class Game:
 
         if flag and self.start.counter <= len(self.start.story_description) :
             self.start.counter += 1
+
+    def community(self, dt):
+        if self.com_npc == None:
+            self.com_npc = Communication(self)
+
+        self.com_npc.draw()
+        # print(self.com_npc.draw_flag)
+        # if self.com_npc.draw_flag:
+        #     self.game_stage = 'main'
 
     def main_screen(self, dt):
         self.all_sprites.update(dt, self.current_map)
@@ -194,7 +207,7 @@ class Game:
                 }
                 # print(f'pos:{save_data}')
                 game_data = GameData(save_info=save_data)
-                game_data.Save()
+                game_data.save()
 
                 self.running = False
 
@@ -202,6 +215,9 @@ class Game:
                 # バトル終了後、メイン画面に戻る処理
                 if event.key == pg.K_SPACE and self.game_stage == 'battle':
                     self.battle.get_battle_result()
+
+                elif event.key == pg.K_SPACE and self.game_stage == 'community':
+                    self.game_stage = 'main'
 
             # BattleScreenのマウスイベントを処理
             self.update_message_flag = self.battle.handle_mouse_event(event)
