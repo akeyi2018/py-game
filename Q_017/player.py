@@ -115,7 +115,8 @@ class Player(pg.sprite.Sprite):
         for i, row in enumerate(current_map):
             row_area = []
             for j, column in enumerate(row):
-                if column == 'B':
+                # BlockとNPC
+                if column == 'B' or column == 'N':
                     row_area.append(1) 
                 else:
                     row_area.append(0)

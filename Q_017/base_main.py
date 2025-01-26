@@ -25,7 +25,7 @@ class Game:
         self.clock = pg.time.Clock()
         self.running = True
 
-        # all sprite
+        # 全てのスプライトを再生成
         self.all_sprites = AllSprites()
 
         self.battle_sprites = AllSprites()
@@ -35,6 +35,8 @@ class Game:
 
         self.start = None
         self.com_npc = None
+
+
 
         # バトル管理
         self.init_battle = True  # バトル画面初期化フラグ
@@ -104,6 +106,9 @@ class Game:
         self.all_sprites.update(dt, self.current_map)
         self.display_surface.fill(BLUE)
         self.all_sprites.draw()
+        if self.battle.status.view_status['HP']:
+            val = self.battle.status.view_status['HP']
+            self.bar.draw_bar_of_main(100,100+30, val, self.display_surface)
 
     def show_battle_screen(self, dt):
 
@@ -160,35 +165,32 @@ class Game:
     # メインステージ、敵の数、Playerの数上手くリセットできていない
     def init_game_state(self):
 
-        # 全てのスプライトを再生成
-        self.all_sprites = AllSprites()
-
         # プレイヤーとマップを再生成
-        self.player, self.current_map = Map(self, self.all_sprites).create()
+        self.player, self.current_map, self.bar = Map(self, self.all_sprites).create()
 
         # バトルの状態を完全にリセット
-        self.battle = BattleScreen(self, self.battle_sprites)
-        self.init_battle = True
-        self.battle.reset()
+        self.reset_battle()
 
         # ゲームステージを"main"に戻す
         self.game_stage = 'main'
 
     def reset_game_state(self, save_info):
 
-        # 全てのスプライトを再生成
-        self.all_sprites = AllSprites()
-
         # プレイヤーとマップを再生成
-        self.player, self.current_map = Map(self, self.all_sprites).reset(save_info)
+        self.player, self.current_map, self.bar = Map(self, self.all_sprites).reset(save_info)
+        
+        # バトルの状態を完全にリセット
+        self.reset_battle()
 
+        # ゲームステージを"main"に戻す
+        self.game_stage = 'main'
+
+    def reset_battle(self):
         # バトルの状態を完全にリセット
         self.battle = BattleScreen(self, self.battle_sprites)
         self.init_battle = True
         self.battle.reset()
 
-        # ゲームステージを"main"に戻す
-        self.game_stage = 'main'
 
     def events(self):
         for event in pg.event.get():

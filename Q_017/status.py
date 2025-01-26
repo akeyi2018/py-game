@@ -4,7 +4,7 @@ from settings import *
 from player_data import *
 
 class PlayerStatus(pg.sprite.Sprite):
-    def __init__(self, bg_size, battle_sprites, *groups):
+    def __init__(self, bg_size=None, battle_sprites=None, *groups):
         super().__init__(*groups)
 
         self.offset = pg.Vector2()
@@ -23,9 +23,19 @@ class PlayerStatus(pg.sprite.Sprite):
             'ATK': 30,
             'DEF': 25
         }
-
-        self.font = pg.font.Font(FONT, 20)
         self.battle_sprites = battle_sprites
+        self.font_size = 20
+
+    def draw_bar_of_main(self, x, y, val, screen):
+        self.bar_rect = pg.FRect(x,
+                                 y, 
+                                 100,15)
+        pg.draw.rect(screen, (RED), self.bar_rect)
+        ratio = self.bar_rect.width / HP
+        # val = self.view_status['HP']
+        progress_rect = pg.FRect(self.bar_rect.topleft, (val * ratio, self.bar_rect.height))
+        pg.draw.rect(screen, (GREEN), progress_rect)
+        pg.draw.rect(screen, (WHITE), self.bar_rect, 2, border_radius=2)
 
     def draw_bar(self):
         self.bar_rect = pg.FRect(self.offset.x + self.bg_size[0] + 110,
@@ -62,8 +72,8 @@ class PlayerStatus(pg.sprite.Sprite):
 
         for (k,v), y in zip(self.view_status.items(), y_pos):
             text_sprite = TextSprite(
-                k + ' : ' + str(v), 
-                self.font, 
+                k + ' : ' + str(v),
+                self.font_size,
                 (255,255,255),(0,0,0), 
                 self.offset.x + self.bg_size[0] + span - 20,
                 y, self.battle_sprites)

@@ -1,6 +1,6 @@
 from settings import * 
 import pygame as pg
-from utils import Button, TextAnimation, Sound, TextSprite
+from utils import TextAnimation
 
 class Communication:
     def __init__(self, parent):

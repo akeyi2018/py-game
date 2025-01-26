@@ -163,8 +163,8 @@ class BattleScreen(pg.sprite.Sprite):
         damege = int(self.status.infact_status['ATK'] / 4) - int(self.enemy.mob_info['DEF']/3)
         # damege = int(self.status.infact_status['ATK']*2 ) - int(self.enemy.mob_info['DEF']/3)
 
-        # self.enemy.mob_info['HP'] -= damege
-        self.enemy.mob_info['HP'] -= 200
+        self.enemy.mob_info['HP'] -= damege
+        # self.enemy.mob_info['HP'] -= 200
         
         mes = f'{self.status.view_status['name']}は攻撃しました。' + \
             f'{self.enemy.name}は{damege}のダメージを受けました。'

@@ -8,14 +8,13 @@ class GameOver:
     def __init__(self, parent):
         self.parent = parent
         self.screen = self.parent.display_surface
-        self.font = pg.font.Font("../battle/Meiryo.ttf", 36)
         self.game_over_sprites = pg.sprite.Group()
-        self.text = TextSprite('Game Over', self.font, 
+        self.text = TextSprite('Game Over', 36, 
                                (255,255,255),  
                                (0,0,255), 
                                WIDTH / 2 -100, HEIGHT /2, self.game_over_sprites)
-        self.font = pg.font.Font("../battle/Meiryo.ttf", 20)
-        self.text2 = TextSprite('Press Return Key TO CONTINUE...', self.font, 
+
+        self.text2 = TextSprite('Press Return Key TO CONTINUE...', 20, 
                                (255,255,255),  
                                (0,0,255), 
                                WIDTH / 2 -150, HEIGHT /2 + HEIGHT/4, self.game_over_sprites)

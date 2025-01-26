@@ -67,10 +67,10 @@ class Button:
         return self.rect.collidepoint(mouse_pos)
     
 class TextSprite(pg.sprite.Sprite):
-    def __init__(self, text, font, fore_color, bg_color, x, y, all_sprites):
+    def __init__(self, text, font_size, fore_color, bg_color, x, y, all_sprites):
         super().__init__()
         self.text = text
-        self.font = font
+        self.font = pg.font.Font(FONT, font_size)
         self.color = fore_color
         self.bg_color = bg_color
         # self.image = self.font.render(self.text, True, self.color, self.bg_color)

@@ -9,10 +9,10 @@ class StartMenu:
         self.parent = parent
         self.screen = self.parent.display_surface
         self.start_sprites = pg.sprite.Group()
-        self.font_title = pg.font.Font(FONT, 36)
+        self.font_size = 36
         self.font_description = pg.font.Font(FONT, 24)
         self.forecolor = "#FFFFFF"
-        self.text = TextSprite('北境の黎明', self.font_title, 
+        self.text = TextSprite('北境の黎明', self.font_size, 
                                self.forecolor,  
                                (0,0,255), 
                                WIDTH / 2 - 200, 50, self.start_sprites)
