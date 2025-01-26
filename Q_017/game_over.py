@@ -27,6 +27,5 @@ class GameOver:
 
     def input(self):
         keys = pg.key.get_pressed()
-        if keys[pg.K_RETURN]: 
-            self.parent.start.counter = 0
+        if keys[pg.K_RETURN]:
             self.parent.game_stage = 'start_menu'

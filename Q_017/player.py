@@ -25,7 +25,7 @@ class Player(pg.sprite.Sprite):
         self.hit_box_rect = self.rect.inflate(-10,-10)
 
         # 移動関連
-        self.key_speed = 5
+        self.key_speed = 10
         self.direction = pg.Vector2(0, 0)
         self.game_stage = 'main'
         # self.enemy_name = ''
@@ -53,11 +53,21 @@ class Player(pg.sprite.Sprite):
 
         for enemy_sprite in self.enemy_sprites:
             if enemy_sprite.rect.colliderect(self.hit_box_rect):
-                print(f'{enemy_sprite.name}と衝突しました！')
-                self.parent.game_stage = 'battle'
-                self.collided_enemy = enemy_sprite
-                collided_enemies.append((enemy_sprite)) #あとで集計ログで使うので残す
-        
+                # print(f'{enemy_sprite.name}と衝突しました！')
+                # print(f'x:{int(self.hit_box_rect.centerx / TILE_SIZE)}\
+                #       y:{int(self.hit_box_rect.centery / TILE_SIZE)}')
+                try:
+                    # att = enemy_sprite.surface
+                    # print(att)
+                    self.collided_enemy = enemy_sprite
+                    # print(type(self.collided_enemy))
+                    # print(enemy_sprite.__dict__.keys())
+                    # print('OK')
+                    self.parent.game_stage = 'battle'
+                    collided_enemies.append(enemy_sprite) #あとで集計ログで使うので残す
+                except Exception as e:
+                    print(f'予想しない敵と衝突: {e}')
+
         # Mobの位置を取得
         self.mob_pos_info = [enemy.mob_pos for enemy in self.enemy_sprites]
 
@@ -66,6 +76,9 @@ class Player(pg.sprite.Sprite):
             if enemy_sprite in self.enemy_sprites:
                 # スプライトグループから削除
                 enemy_sprite.kill()
+                # self.enemy_sprites.remove(enemy_sprite)
+
+                # self.enemy_sprites = [e for e in self.enemy_sprites if e.alive()]  # `alive()` で生存チェック
 
         if len(self.mob_pos_info) < MAX_ENEMY_NUM:
             # Mob生成
@@ -73,6 +86,7 @@ class Player(pg.sprite.Sprite):
         
         # メイン矩形をヒットボックスに同期
         self.rect.center = self.hit_box_rect.center
+        # self.debug_enemy_sprites()
 
     def cal_mob_area(self, mob_pos_info, max_y, max_x):
 
@@ -93,6 +107,13 @@ class Player(pg.sprite.Sprite):
             all_list.extend(mob_area)
 
         return all_list
+    
+    def debug_enemy_sprites(self):
+        print("=== Debug Enemy Sprites ===")
+        for enemy in self.enemy_sprites:
+            print(f"Enemy at ({enemy.rect.x}, {enemy.rect.y}) - Alive: {enemy.alive()}")
+
+        print(f"Total enemies: {len(self.enemy_sprites)}")
     
     def place_exits_mob(self, map_data, mob_pos_info, num):
         max_y = len(map_data)
@@ -154,7 +175,7 @@ class Player(pg.sprite.Sprite):
             # Mob生成
             entry = EntryEnemy()
             mob_info = entry.generate_random_enemy()
-            Enemy((y, x), mob_info, flattened_list, self.enemy_sprites, self.all_sprites)
+            Enemy((y, x), mob_info, flattened_list, self.enemy_sprites)
         else:
             print("モンスターを配置できるスペースがありません。")
 

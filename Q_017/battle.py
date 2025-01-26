@@ -180,7 +180,7 @@ class BattleScreen(pg.sprite.Sprite):
         # 反撃(一回でPlayerが倒される)
         else:
             p_damege = int(self.enemy.mob_info['STR']) - int(self.status.infact_status['DEF']/4)
-            # p_damege = 200
+            p_damege = 200
 
             self.status.view_status['HP'] -= p_damege
             if self.status.view_status['HP'] <= 0 : self.status.view_status['HP'] = 0
@@ -200,6 +200,7 @@ class BattleScreen(pg.sprite.Sprite):
             self.battle_active = True
             self.parent.game_stage = 'main'
         elif self.status.view_status['HP'] == 0:
+
             self.parent.game_stage = 'game_over'
 
     def get_que_cool_time(self):
@@ -231,7 +232,9 @@ class BattleScreen(pg.sprite.Sprite):
     def draw(self, player, screen):
         self.enemy = player.collided_enemy
         self.mob_pos =  ((WIDTH - 128) /2,HEIGHT /8)
-        self.mob_surface = self.enemy.battle_surface.copy()
+        # print(self.enemy.__dict__.keys())
+
+        self.mob_surface = self.enemy.surface
         
         self.msg_que.put(f'  {self.enemy.name}が現れました!')
         

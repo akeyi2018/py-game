@@ -30,13 +30,13 @@ class Game:
 
         self.battle_sprites = AllSprites()
 
+        self.enemy_sprites = AllSprites()
+
         self.game_stage = STAGE
         self.current_stage = self.game_stage
 
         self.start = None
         self.com_npc = None
-
-
 
         # バトル管理
         self.init_battle = True  # バトル画面初期化フラグ
@@ -106,6 +106,7 @@ class Game:
         self.all_sprites.update(dt, self.current_map)
         self.display_surface.fill(BLUE)
         self.all_sprites.draw()
+        self.enemy_sprites.draw()
         if self.battle.status.view_status['HP']:
             val = self.battle.status.view_status['HP']
             self.bar.draw_bar_of_main(100,100+30, val, self.display_surface)
@@ -118,9 +119,10 @@ class Game:
             self.battle.counter = 0
             self.init_battle = False  
 
-            # バトル画面描画
-            self.battle.draw(self.player, self.display_surface)
-            self.battle_sprites.draw_battle()
+            if not self.player.collided_enemy == None:
+                # バトル画面描画
+                self.battle.draw(self.player, self.display_surface)
+                self.battle_sprites.draw_battle()
         
         # 戦闘時メッセージの更新
         if self.update_message_flag:
@@ -158,15 +160,22 @@ class Game:
 
 
     def show_game_over(self, dt):
+        
         self.display_surface.fill((0, 0, 0))  # RGBで黒 (0, 0, 0)
         self.game = GameOver(self)
         self.game.draw()
+     
 
     # メインステージ、敵の数、Playerの数上手くリセットできていない
     def init_game_state(self):
 
+        for e in self.all_sprites:
+            if e.alive(): e.kill()
+
         # プレイヤーとマップを再生成
         self.player, self.current_map, self.bar = Map(self, self.all_sprites).create()
+
+        # print(f'all:{len(self.all_sprites)}')
 
         # バトルの状態を完全にリセット
         self.reset_battle()
@@ -176,9 +185,16 @@ class Game:
 
     def reset_game_state(self, save_info):
 
+        self.player = None
+
+        for e in self.all_sprites:
+            if e.alive(): e.kill()
+
         # プレイヤーとマップを再生成
         self.player, self.current_map, self.bar = Map(self, self.all_sprites).reset(save_info)
         
+        # print(f'all:{len(self.all_sprites)}')
+
         # バトルの状態を完全にリセット
         self.reset_battle()
 
@@ -186,6 +202,9 @@ class Game:
         self.game_stage = 'main'
 
     def reset_battle(self):
+
+        # メインメニューをリセットする
+        self.start = None
         # バトルの状態を完全にリセット
         self.battle = BattleScreen(self, self.battle_sprites)
         self.init_battle = True
@@ -213,8 +232,9 @@ class Game:
                 elif event.key == pg.K_SPACE and self.game_stage == 'community':
                     self.game_stage = 'main'
 
-            # BattleScreenのマウスイベントを処理
-            self.update_message_flag = self.battle.handle_mouse_event(event)
+            if not self.battle == None: 
+                # BattleScreenのマウスイベントを処理
+                self.update_message_flag = self.battle.handle_mouse_event(event)
 
             # メインメニューのマウスイベント処理
             if not self.start == None: self.start.handle_mouse_event(event)
