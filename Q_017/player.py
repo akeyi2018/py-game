@@ -18,7 +18,8 @@ class Player(pg.sprite.Sprite):
         self.pos = pos
 
         # イメージの読み込み
-        self.surface = pg.image.load(IMAGE_PATH).convert_alpha()
+        self.ori_surface = pg.image.load(IMAGE_PATH).convert_alpha()
+        self.surface = pg.transform.scale(self.ori_surface,(TILE_SIZE, TILE_SIZE))
 
         # 矩形（rect）と位置情報
         self.rect = self.surface.get_frect(topleft=self.pos)
@@ -239,7 +240,7 @@ class Player(pg.sprite.Sprite):
             if block.rect.colliderect(self.hit_box_rect):
                 if self.direction.x > 0:  # 右に移動中
                     self.hit_box_rect.right = block.rect.left
-                elif self.direction.x < 0:  # 左に移動中
+                if self.direction.x < 0:  # 左に移動中
                     self.hit_box_rect.left = block.rect.right
                 # 衝突後、移動量をリセット
                 self.direction.x = 0
@@ -250,7 +251,7 @@ class Player(pg.sprite.Sprite):
             if block.rect.colliderect(self.hit_box_rect):
                 if self.direction.y > 0:  # 下に移動中
                     self.hit_box_rect.bottom = block.rect.top
-                elif self.direction.y < 0:  # 上に移動中
+                if self.direction.y < 0:  # 上に移動中
                     self.hit_box_rect.top = block.rect.bottom
                 # 衝突後、移動量をリセット
                 self.direction.y = 0

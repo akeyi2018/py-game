@@ -10,6 +10,7 @@ class StartMenu:
         self.screen = self.parent.display_surface
         self.start_sprites = pg.sprite.Group()
         self.font_size = 36
+        # self.font_description = pg.font.Font('SimHei.ttf', 24)
         self.font_description = pg.font.Font(FONT, 24)
         self.forecolor = "#FFFFFF"
         self.text = TextSprite('北境の黎明', self.font_size, 
@@ -29,6 +30,9 @@ class StartMenu:
         self.story_description = '清朝末期。歴史に稀を見る時代は混乱を極み、\n\
 中原の人々は天災、戦乱、飢饉により、酷寒で漢民族の禁足の地の満州に渡った、\n\
 その中、ひとりの若者が静かに動き出すのだった...'
+#         self.story_description = '烈风带残云，落花天地白。万物静，鸟不鸣。\n\
+# 中原の人々は天災、戦乱、飢饉により、酷寒で漢民族の禁足の地の満州に渡った、\n\
+# その中、ひとりの若者が静かに動き出すのだった...'
         self.descriptions = TextAnimation(
             self.font_description,
             self.forecolor, (0,0,255),
