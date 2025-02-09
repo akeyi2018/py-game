@@ -76,7 +76,7 @@ class BattleScreen(pg.sprite.Sprite):
 
     def get_actions(self):
         # 
-        magic_list = Magic_maneger(self).magic_list
+        magic_list = Magic_maneger(self).current_magic
         magic_list.append(("cancel", self.cancel))   
         # print(magic_list)     
 

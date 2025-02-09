@@ -1,3 +1,6 @@
+from sub.player_data import *
+
+
 class Magic:
     def __init__(self, name, cost, effect):
         self.name = name  # 魔法の名前
@@ -12,11 +15,35 @@ class Magic:
 class Magic_maneger:
     def __init__(self, parent):
         self.parent = parent
-        self.magic_list = [
+        self.all_magic_list = [
             ("ホイミ", self.hoimi_effect),  # 名前, 消費MP, 効果
             ("メラ", self.mera_effect),
             ("ヒャド", self.hyado_effect),
         ]
+        self.magic_table = {
+            "ホイミ": 1,
+            "メラ": 5,
+            "ヒャド": 8
+        }
+
+        self.magic_name_list = []
+        self.get_magic_name()
+
+        self.current_magic = []
+        self.append_magic()
+
+    # 魔法名を取得
+    def get_magic_name(self):
+        for k, v in self.magic_table.items():
+            if LV >= v:
+                self.magic_name_list.append(k)
+
+    # 魔法を装備
+    def append_magic(self):
+        for name in self.magic_name_list:
+            for i, (m, _) in enumerate(self.all_magic_list):
+                if name in m:
+                    self.current_magic.append(self.all_magic_list[i])
 
     def hoimi_effect(self):
         # cost
