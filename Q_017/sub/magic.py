@@ -10,16 +10,29 @@ class Magic:
             self.effect(target)
 
 class Magic_maneger:
-    def __init__(self):
+    def __init__(self, parent):
+        self.parent = parent
         self.magic_list = [
-            Magic("ホイミ", 5, self.hoimi_effect),  # 名前, 消費MP, 効果
-            Magic("メラ", 7, self.mera_effect),
-            Magic("ヒャド", 8, self.hyado_effect),
+            ("ホイミ", self.hoimi_effect),  # 名前, 消費MP, 効果
+            ("メラ", self.mera_effect),
+            ("ヒャド", self.hyado_effect),
         ]
 
-    def hoimi_effect(self, target):
-        target.hp += 20  # 例: HPを20回復
-        print(f"{target.name}のHPが20回復した！")
+    def hoimi_effect(self):
+        # cost
+        cost = 5
+        if cost <= self.parent.status.view_status['MP']:
+            self.parent.status.view_status['MP'] -= cost
+            self.parent.status.view_status['HP'] += 20  # 例: HPを20回復
+            if self.parent.status.view_status['HP'] >= self.parent.status.view_status['MAX_HP']:
+                self.parent.status.view_status['HP'] = self.parent.status.view_status['MAX_HP']
+            msg = f"  {self.parent.status.view_status['name']}はホイミを唱えました。"
+            self.parent.msg_que.put(msg)
+            msg = f"  {self.parent.status.view_status['name']}のHPが20回復した！"
+            self.parent.msg_que.put(msg)
+            self.parent.menu.show_main_commands()
+        else:
+            print("MPが足りない！")
 
     def mera_effect(self, target):
         target.hp -= 10  # 例: 敵に10ダメージ

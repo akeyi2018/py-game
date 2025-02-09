@@ -143,8 +143,8 @@ class Game:
         #     self.battle.counter = 0
 
         # # 戦闘コマンドの描画(マウスホーバーを検知するため、ループの外側で実装)
-        # if self.battle.battle_active:
-        #     self.battle.draw_buttons()
+        if self.battle.battle_active:
+            self.battle.draw_buttons()
 
         # self.battle.status.draw_status(self.display_surface)
         

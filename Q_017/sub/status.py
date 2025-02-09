@@ -1,7 +1,7 @@
 import pygame as pg
 from utils import TextSprite 
 from sub.settings import *
-from player_data import *
+from sub.player_data import *
 
 class PlayerStatus(pg.sprite.Sprite):
     def __init__(self, bg_size=None, battle_sprites=None, *groups):
@@ -17,7 +17,8 @@ class PlayerStatus(pg.sprite.Sprite):
             "job": JOB,
             "HP": HP,
             "MP": MP,
-            "LV": LV
+            "LV": LV,
+            "MAX_HP": MAX_HP
         }
         self.infact_status = {
             'ATK': 30,

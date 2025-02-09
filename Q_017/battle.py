@@ -5,6 +5,7 @@ from sub.status import PlayerStatus
 import queue
 from sub.battle_menu import BattleMenu
 from sub.battle_layout import BattleLayout
+from sub.magic import Magic, Magic_maneger, Model
 
 class BattleScreen(pg.sprite.Sprite):
     def __init__(self, parent, battle_sprites):
@@ -74,18 +75,18 @@ class BattleScreen(pg.sprite.Sprite):
             self.message_next_flag = False
 
     def get_actions(self):
+        # 
+        magic_list = Magic_maneger(self).magic_list
+        magic_list.append(("cancel", self.cancel))   
+        # print(magic_list)     
+
         return {
             "main": [
                 ("Attack", self.attack),
                 ("Magic", self.show_sub_commands),
                 ("逃げる", self.escape),
             ],
-            "sub": [
-                ("ホイミ", self.hoimi),
-                ("メラ", self.mera),
-                ("ヒャド", self.hyado),
-                ("Cancel", self.cancel),
-            ],
+            "magic": magic_list,
         }
 
     def attack(self):
@@ -142,20 +143,7 @@ class BattleScreen(pg.sprite.Sprite):
     def escape(self):
         self.msg_que.put(f'  逃げる')
 
-    def hoimi(self):
-        self.battle_message.append('ホイミ')
-        self.menu.show_main_commands()
-
     def cancel(self):
-        self.menu.show_main_commands()
-
-    def mera(self):
-        self.battle_message.append('メラ')
-
-        self.menu.show_main_commands()
-
-    def hyado(self):
-        self.battle_message.append('ヒャド')
         self.menu.show_main_commands()
 
     # サブコマンドを表示

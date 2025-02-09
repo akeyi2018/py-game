@@ -12,7 +12,7 @@ class BattleMenu:
 
         self.buttons = {
             "main": self.create_buttons(actions['main'], self.px, self.main_pos_y),
-            "sub": self.create_buttons(actions['sub'], self.px, self.sub_pos_y),
+            "magic": self.create_buttons(actions['magic'], self.px, self.sub_pos_y),
         }
         
         self.current_command = "main"
@@ -30,7 +30,7 @@ class BattleMenu:
         self.draw_buttons(self.layout)
 
     def show_sub_commands(self):
-        self.current_command = 'sub'
+        self.current_command = 'magic'
         # print(f"Current Command: {self.current_command}")  # デバッグ用
         self.draw_buttons(self.layout)
 

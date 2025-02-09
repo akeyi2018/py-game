@@ -1,6 +1,6 @@
 import pygame as pg
 from sub.settings import *
-from player_data import *
+from sub.player_data import *
 from wall import Block
 from enemy import Enemy
 from enemy_maneger import EntryEnemy
