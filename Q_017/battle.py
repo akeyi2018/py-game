@@ -3,90 +3,8 @@ from settings import *
 from utils import Button, TextAnimation, Sound, TextSprite
 from status import PlayerStatus
 import queue
-
-class BattleMenu:
-    def __init__(self, actions):
-        self.display_surface = pg.display.get_surface()
-        
-        self.px = 30
-        self.main_pos_y = [30, 80, 530]
-        self.sub_pos_y = [30, 80, 130, 180] 
-
-        self.buttons = {
-            "main": self.create_buttons(actions['main'], self.px, self.main_pos_y),
-            "sub": self.create_buttons(actions['sub'], self.px, self.sub_pos_y),
-        }
-        
-        self.currend_command = "main"
-
-    def create_buttons(self, actions, x, y_positons):
-        btn_width, btn_height = 100, 40
-        return [
-            Button(x, y_positons[i], btn_width, btn_height, name, action)
-            for i, (name, action) in enumerate(actions)
-        ]
-
-    # メインコマンドを表示
-    def show_main_commands(self):
-        self.currend_command = 'main'
-
-    def show_sub_commands(self):
-        self.currend_command = 'sub'
-
-    # 描画
-    def draw_buttons(self):
-        for button in self.buttons[self.currend_command]:
-            button.draw(self.display_surface)
-
-    def handle_mouse_event(self, event):
-        if event.type == pg.MOUSEBUTTONDOWN:
-            mouse_pos = event.pos  # クリックした位置を取得
-            for button in self.buttons[self.currend_command]:
-                if button.check_click(mouse_pos):  # ボタンがクリックされたか判定
-                    button.action()  # ボタンに設定された関数を呼び出し
-                    return True
-
-class BattleLayout:
-    def __init__(self):
-        self.display_surface = pg.display.get_surface()
-        self.back_ground_img = pg.image.load('../battle/bg.png')
-        self.back_ground_img = pg.transform.scale(self.back_ground_img, (819, HEIGHT))
-
-        self.bg_size = self.back_ground_img.get_size()
-        self.rect = self.back_ground_img.get_rect()
-        self.off_set = pg.Vector2()
-        self.off_set.x = -int((self.rect.centerx - WIDTH /2))
-        self.off_set.y = -int((self.rect.centery - HEIGHT /2))
-    
-    def draw_background(self, screen):
-        self.screen = screen
-        self.screen.fill((0, 0, 0))
-        self.screen.blit(self.back_ground_img, self.rect.topleft + self.off_set)
-
-    def draw_menu_backgroud(self):
-        pg.draw.rect(self.display_surface, '#8E7698', [2, 2, self.off_set.x -2, HEIGHT-2])
-        pg.draw.rect(self.display_surface,'#D3DED0', [0, 0, self.off_set.x, HEIGHT],5,border_radius=5)
-
-    def draw_background_text_area(self, screen):
-        """必要最小限の透明マスクを新規作成し、配置する"""
-        self.text_area_rect = pg.Rect(250, 430, self.bg_size[0] * 0.95, self.bg_size[1] * 0.3)
-
-        # screen.fill((0,0,0), self.text_area_rect)
-
-        # # 半透明の背景色を設定
-        # semi_transparent_surface = pg.Surface(self.text_area_rect.size, pg.SRCALPHA)
-        # semi_transparent_surface.fill((10, 15, 5, 190))  # 半透明の青色
-        
-        # # 角の描画ですこし小さくする
-        # self.display_surface.blit(semi_transparent_surface, 
-        #                           [self.text_area_rect.x + 2,
-        #                            self.text_area_rect.y + 2,
-        #                            self.text_area_rect.width -2,
-        #                            self.text_area_rect.height -2])
-
-
-        # 枠線を再描画
-        pg.draw.rect(self.display_surface, (255, 255, 255), self.text_area_rect, 3, border_radius=5)
+from battle_menu import BattleMenu
+from battle_layout import BattleLayout
 
 class BattleScreen(pg.sprite.Sprite):
     def __init__(self, parent, battle_sprites):
@@ -138,6 +56,22 @@ class BattleScreen(pg.sprite.Sprite):
         self.current_command = None
         self.enemy = None
 
+    def update(self, dt):
+        self.process_message_queue()
+        self.get_que_cool_time()
+        self.text_sprites.update(dt)
+        self.draw_messages()
+        # HP更新
+        self.status.draw_status(self.display_surface)
+
+    def process_message_queue(self):
+        if self.msg_que.qsize() > 0 and self.message_next_flag:
+            que = self.msg_que.get()
+            self.que_cool_timer = pg.time.get_ticks()
+            self.battle_message.append(que)
+            if len(self.battle_message) > MAX_MESSAGE:
+                del self.battle_message[0]
+            self.message_next_flag = False
 
     def get_actions(self):
         return {
@@ -228,31 +162,41 @@ class BattleScreen(pg.sprite.Sprite):
     def show_sub_commands(self):
         self.menu.show_sub_commands()
 
-    def draw(self, player, screen):
+    def draw(self, player):
         self.enemy = player.collided_enemy
         self.mob_pos =  ((WIDTH - 128) /2,HEIGHT /8)
-        # print(self.enemy.__dict__.keys())
 
         self.mob_surface = self.enemy.surface
         
         self.msg_que.put(f'  {self.enemy.name}が現れました!')
         
-        self.render_scene(screen)
+        self.render_scene()
 
-    def render_scene(self, screen):
-        self.layout.draw_background(screen)
+    def draw_messages(self):
+        if len(self.battle_message) > 0:
+            flag, self.counter = self.text_sprites.draw(
+                self.battle_message, 
+                self.counter
+            )
+            if flag and self.counter <= len(self.battle_message[-1]):
+                self.counter += 1
 
+    def render_scene(self):
+        # 背景レイヤー
+        self.layout.draw_background(self.display_surface)
+
+        # キャラクターレイヤー
+        if self.battle_active or self.status.view_status['HP'] <= 0:
+            self.display_surface.blit(self.enemy.battle_surface, self.mob_pos)
+
+        # UIレイヤー
+        self.layout.draw_background_text_area(self.display_surface)
+        self.status.draw_status(self.display_surface)
+
+        # メニューレイヤー（最前面）
+        self.layout.draw_menu_background()
         if self.battle_active:
-            self.display_surface.blit(self.enemy.battle_surface, self.mob_pos)
-        elif self.status.view_status['HP'] <=0:
-            self.display_surface.blit(self.enemy.battle_surface, self.mob_pos)
-
-        self.layout.draw_background_text_area(screen)
-
-        self.layout.draw_menu_backgroud()
-
-        # player status
-        self.status.draw_status(screen)
+            self.draw_buttons()  
 
     def update_message(self, screen):
         self.render_scene(screen)
@@ -272,4 +216,5 @@ class BattleScreen(pg.sprite.Sprite):
         return False
     
     def draw_buttons(self):
-        self.menu.draw_buttons()
+
+        self.menu.draw_buttons(self.layout)

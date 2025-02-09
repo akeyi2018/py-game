@@ -112,51 +112,62 @@ class Game:
             self.bar.draw_bar_of_main(100,100+30, val, self.display_surface)
 
     def show_battle_screen(self, dt):
-
-        # バトル画面の初期化
+        # バトル初期化
         if self.init_battle:
-            self.battle.battle_message = []
-            self.battle.counter = 0
-            self.init_battle = False  
-
+            self.battle.reset()
             if not self.player.collided_enemy == None:
-                # バトル画面描画
-                self.battle.draw(self.player, self.display_surface)
+                self.battle.draw(self.player)
                 self.battle_sprites.draw_battle()
+            self.init_battle = False
         
-        # 戦闘時メッセージの更新
-        if self.update_message_flag:
-            self.battle.update_message(self.display_surface)
-            self.battle_sprites.draw_battle()
-            self.update_message_flag = False
-            self.battle.counter = 0
+        # バトル更新処理
+        self.battle.update(dt)
 
-        # 戦闘コマンドの描画(マウスホーバーを検知するため、ループの外側で実装)
-        if self.battle.battle_active:
-            self.battle.draw_buttons()
+        # # バトル画面の初期化
+        # if self.init_battle:
+        #     self.battle.reset()
+        #     self.battle.battle_message = []
+        #     self.battle.counter = 0
+        #     self.init_battle = False  
 
-        self.battle.status.draw_status(self.display_surface)
+        #     if not self.player.collided_enemy == None:
+        #         # バトル画面描画
+        #         self.battle.draw(self.player, self.display_surface)
+        #         self.battle_sprites.draw_battle()
         
-        self.battle.text_sprites.update(dt)
+        # # 戦闘時メッセージの更新
+        # if self.update_message_flag:
+        #     self.battle.update_message(self.display_surface)
+        #     self.battle_sprites.draw_battle()
+        #     self.update_message_flag = False
+        #     self.battle.counter = 0
 
-        if self.battle.msg_que.qsize() > 0 and self.battle.message_next_flag:
+        # # 戦闘コマンドの描画(マウスホーバーを検知するため、ループの外側で実装)
+        # if self.battle.battle_active:
+        #     self.battle.draw_buttons()
+
+        # self.battle.status.draw_status(self.display_surface)
+        
+        # self.battle.text_sprites.update(dt)
+
+        # if self.battle.msg_que.qsize() > 0 and self.battle.message_next_flag:
             
-            que = self.battle.msg_que.get()
-            self.battle.que_cool_timer = pg.time.get_ticks()
-            self.battle.battle_message.append(que)
-            if len(self.battle.battle_message) > MAX_MESSAGE:
-                del self.battle.battle_message[0]
+        #     que = self.battle.msg_que.get()
+        #     self.battle.que_cool_timer = pg.time.get_ticks()
+        #     self.battle.battle_message.append(que)
+        #     if len(self.battle.battle_message) > MAX_MESSAGE:
+        #         del self.battle.battle_message[0]
             
-            self.battle.message_next_flag = False
+        #     self.battle.message_next_flag = False
 
-        self.battle.get_que_cool_time()
+        # self.battle.get_que_cool_time()
         
-        if len(self.battle.battle_message) > 0:
-            # 戦闘メッセージの描画
-            flag, self.battle.counter = self.battle.text_sprites.draw(self.battle.battle_message, self.battle.counter)
-            if flag:
-                if self.battle.counter <= len(self.battle.battle_message[-1]):
-                    self.battle.counter += 1
+        # if len(self.battle.battle_message) > 0:
+        #     # 戦闘メッセージの描画
+        #     flag, self.battle.counter = self.battle.text_sprites.draw(self.battle.battle_message, self.battle.counter)
+        #     if flag:
+        #         if self.battle.counter <= len(self.battle.battle_message[-1]):
+        #             self.battle.counter += 1
 
 
     def show_game_over(self, dt):
