@@ -1,4 +1,4 @@
-from settings import * 
+from sub.settings import * 
 import pygame as pg
 import random
 from enemy import Enemy

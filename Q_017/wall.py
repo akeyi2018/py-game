@@ -1,5 +1,5 @@
 import pygame as pg
-from settings import *
+from sub.settings import *
 
 class Block(pg.sprite.Sprite):
     def __init__(self, pos, img_path, *groups):

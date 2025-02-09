@@ -1,5 +1,5 @@
 import pygame as pg 
-from settings import * 
+from sub.settings import * 
 
 class Util:
     pass
@@ -29,10 +29,6 @@ class Sound:
     def play(self):
         self.music.set_volume(0.8)
         self.music.play()
-
-    # def play_one(self):
-    #     pg.mixer.music.set_volume(0.5)
-    #     pg.mixer.music.play()
 
     def stop(self):
         pg.mixer.music.stop()

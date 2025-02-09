@@ -1,11 +1,11 @@
 import pygame as pg
-from settings import *
+from sub.settings import *
 
-from map import Map
-from groups import AllSprites
+from sub.map import Map
+from sub.groups import AllSprites
 from battle import BattleScreen
-from game_over import GameOver
-from game_start import StartMenu
+from sub.game_over import GameOver
+from sub.game_start import StartMenu
 from utils import Backmusic
 from save_load import GameData
 import os

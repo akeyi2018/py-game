@@ -1,10 +1,10 @@
 import pygame as pg
-from settings import *
+from sub.settings import *
 from utils import Button, TextAnimation, Sound, TextSprite
-from status import PlayerStatus
+from sub.status import PlayerStatus
 import queue
-from battle_menu import BattleMenu
-from battle_layout import BattleLayout
+from sub.battle_menu import BattleMenu
+from sub.battle_layout import BattleLayout
 
 class BattleScreen(pg.sprite.Sprite):
     def __init__(self, parent, battle_sprites):
