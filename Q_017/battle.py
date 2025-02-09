@@ -10,7 +10,7 @@ class BattleMenu:
         
         self.px = 30
         self.main_pos_y = [30, 80, 530]
-        self.sub_pos_y = [30, 80, 130] 
+        self.sub_pos_y = [30, 80, 130, 180] 
 
         self.buttons = {
             "main": self.create_buttons(actions['main'], self.px, self.main_pos_y),
@@ -44,12 +44,7 @@ class BattleMenu:
             for button in self.buttons[self.currend_command]:
                 if button.check_click(mouse_pos):  # ボタンがクリックされたか判定
                     button.action()  # ボタンに設定された関数を呼び出し
-
-                    print(f'button text:{button.text}')
-                    if button.text == 'Magic':
-                        return False
-                    else:
-                        return True
+                    return True
 
 class BattleLayout:
     def __init__(self):
@@ -155,6 +150,7 @@ class BattleScreen(pg.sprite.Sprite):
                 ("ホイミ", self.hoimi),
                 ("メラ", self.mera),
                 ("ヒャド", self.hyado),
+                ("Cancel", self.cancel),
             ],
         }
 
@@ -180,7 +176,7 @@ class BattleScreen(pg.sprite.Sprite):
         # 反撃(一回でPlayerが倒される)
         else:
             p_damege = int(self.enemy.mob_info['STR']) - int(self.status.infact_status['DEF']/4)
-            p_damege = 200
+            # p_damege = 200
 
             self.status.view_status['HP'] -= p_damege
             if self.status.view_status['HP'] <= 0 : self.status.view_status['HP'] = 0
@@ -214,6 +210,9 @@ class BattleScreen(pg.sprite.Sprite):
 
     def hoimi(self):
         self.battle_message.append('ホイミ')
+        self.menu.show_main_commands()
+
+    def cancel(self):
         self.menu.show_main_commands()
 
     def mera(self):

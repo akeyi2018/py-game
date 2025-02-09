@@ -214,13 +214,15 @@ class Game:
     def events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT:
-                save_data = {
-                    "x": max(int(self.player.rect.centerx/TILE_SIZE),2),
-                    "y": max(int(self.player.rect.centery/TILE_SIZE),2)
-                }
-                # print(f'pos:{save_data}')
-                game_data = GameData(save_info=save_data)
-                game_data.save()
+                # セーブはフィールドマップのみ
+                if self.game_stage == 'main':
+                    save_data = {
+                        "x": max(int(self.player.rect.centerx/TILE_SIZE),2),
+                        "y": max(int(self.player.rect.centery/TILE_SIZE),2)
+                    }
+                    # print(f'pos:{save_data}')
+                    game_data = GameData(save_info=save_data)
+                    game_data.save()
 
                 self.running = False
 
